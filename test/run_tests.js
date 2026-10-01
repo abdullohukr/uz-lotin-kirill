@@ -46,6 +46,8 @@ both.forEach(function (p) {
 });
 
 // one direction only
+eq("savodxon stems", t.toCyrillic("avtomobil avtomobilga albumin aksept"), "автомобиль автомобилга альбумин акцепт");
+eq("uzbek words keep no ь", t.toCyrillic("tush tol mil"), "туш тол мил");
 eq("passport surnames", t.toCyrillic("Abdullaev Tillaeva Boboevich"), "Абдуллаев Тиллаева Бобоевич");
 eq("ijmo'", t.toCyrillic("ijmo' istisno'"), "ижмоъ истисноъ");
 eq("ijmo'ni", t.toCyrillic("ijmo'ni"), "ижмоъни");
