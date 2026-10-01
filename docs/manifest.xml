@@ -5,14 +5,14 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>6b0f7c2e-3d1a-4c5e-9a8b-2f4d6e8a1c37</Id>
-  <Version>1.0.0.0</Version>
+  <Version>1.0.1.0</Version>
   <ProviderName>Shaxsiy</ProviderName>
   <DefaultLocale>uz-UZ</DefaultLocale>
   <DisplayName DefaultValue="Lotin ⇄ Kirill"/>
   <Description DefaultValue="O‘zbek matnini lotin va kirill yozuvlari orasida o‘giradi. Qo‘shtirnoqlar va formatlash o‘zgarmaydi."/>
   <IconUrl DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html"/>
+  <SupportUrl DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html?b=2"/>
   <AppDomains>
     <AppDomain>https://abdullohukr.github.io</AppDomain>
   </AppDomains>
@@ -25,7 +25,7 @@
     </Sets>
   </Requirements>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html"/>
+    <SourceLocation DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html?b=2"/>
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
 
@@ -109,8 +109,8 @@
         <bt:Image id="Lat.80" DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/assets/lat-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/commands.html?b=2"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://abdullohukr.github.io/uz-lotin-kirill/taskpane.html?b=2"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="Tab.Label" DefaultValue="Lotin-Kirill"/>

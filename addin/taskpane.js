@@ -52,6 +52,7 @@
   }
 
   function wire() {
+    $("ver").textContent = window.UZ_VERSION || "?";
     fillForm();
     $("toCyr").onclick = function () { run("cyr"); };
     $("toLat").onclick = function () { run("lat"); };
@@ -69,15 +70,21 @@
     };
   }
 
+  // scripts are loaded from <head>, so wait for the page body as well
+  function domReady(fn) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+    else fn();
+  }
   if (window.Office && Office.onReady) {
-    Office.onReady(function (info) {
-      wire();
-      if (info.host !== Office.HostType.Word) {
-        status("Bu panel Word ichida ishlaydi. Pastdagi sinov oynasi brauzerda ham ishlaydi.");
-        $("toCyr").disabled = $("toLat").disabled = true;
-      }
-    });
+    Office.onReady(function (info) { domReady(function () { start(info); }); });
   } else {
-    document.addEventListener("DOMContentLoaded", wire);
+    domReady(wire);
+  }
+  function start(info) {
+    wire();
+    if (info.host !== Office.HostType.Word) {
+      status("Bu panel Word ichida ishlaydi. Pastdagi sinov oynasi brauzerda ham ishlaydi.");
+      $("toCyr").disabled = $("toLat").disabled = true;
+    }
   }
 })();

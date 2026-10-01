@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lotin ⇄ Kirill</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <script src="engine.js"></script>
-  <script src="exceptions.js"></script>
-  <script src="settings.js"></script>
-  <script src="ooxml.js"></script>
-  <script src="word-convert.js"></script>
-  <link rel="stylesheet" href="taskpane.css">
+  <script>
+    // Always load the newest scripts: the page itself may be cached by Word,
+    // so the version comes from version.json, fetched without cache.
+    (function () {
+      var v = String(Date.now());
+      try {
+        var x = new XMLHttpRequest();
+        x.open("GET", "version.json?t=" + v, false);
+        x.send();
+        if (x.status === 200) v = JSON.parse(x.responseText).v;
+      } catch (e) { /* offline: use the timestamp */ }
+      window.UZ_VERSION = v;
+      ["taskpane.css", "engine.js", "exceptions.js", "settings.js", "ooxml.js", "word-convert.js", "taskpane.js"].forEach(function (f) {
+        document.write(/\.css$/.test(f)
+          ? '<link rel="stylesheet" href="' + f + '?v=' + v + '">'
+          : '<script src="' + f + '?v=' + v + '"><\/script>');
+      });
+    })();
+  </script>
 </head>
 <body>
   <header>
@@ -61,7 +74,6 @@
     <span id="saved" class="muted"></span>
   </section>
 
-  <footer class="muted">Hujjatni o‘girishdan oldin saqlab qo‘ying. Bekor qilish: ⌘Z / Ctrl+Z.</footer>
-  <script src="taskpane.js"></script>
+  <footer class="muted">Hujjatni o‘girishdan oldin saqlab qo‘ying. Bekor qilish: ⌘Z / Ctrl+Z.<br>Versiya: <span id="ver"></span></footer>
 </body>
 </html>
