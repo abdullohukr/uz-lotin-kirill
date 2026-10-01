@@ -75,6 +75,13 @@ var packed = [];
 packed.push("AddAcr " + str((ex.acronyms || []).join(" ")));
 var fw = ex.foreign || [];
 for (var fi = 0; fi < fw.length; fi += 90) packed.push("AddWeak " + str(fw.slice(fi, fi + 90).join(" ")));
+// brands: "key=mode" items and phrases (apostrophes in keys as "_", like BrandKey)
+var bw = Object.keys((ex.brands || {}).words || {}).sort().map(function (k) {
+  return k.replace(/'/g, "_") + "=" + ex.brands.words[k];
+});
+for (var bi = 0; bi < bw.length; bi += 60) packed.push("AddBrand " + str(bw.slice(bi, bi + 60).join(" ")));
+var bp = ((ex.brands || {}).phrases || []).map(function (p) { return p.map(function (x) { return x.replace(/'/g, "_"); }).join(" "); });
+for (var pi = 0; pi < bp.length; pi += 40) packed.push("AddPhrase " + str(bp.slice(pi, pi + 40).join("|")));
 dataSubs = dataSubs.concat(emitSubs("UzForeign", packed, 60));
 L2("Private Sub LoadData()");
 dataSubs.forEach(function (n) { L2("    " + n); });
@@ -101,7 +108,10 @@ var sentences = [
   "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online",
   "men ham sport internet son top mana film massa proton Napoleon bee’tibor, QR kod, yer sathi, inshootlar",
   "«Nun» surasi, «Hud» surasi. «Yusha’ ibn Nun tirik edi yoki Bani Isroil payg‘ambarlaridan Ilyos kabilar tirik edi»",
-  "Yusha’ va shay’ ‘Salom’ dedi"
+  "Yusha’ va shay’ ‘Salom’ dedi",
+  "Visa, Mastercard va American Express kartalari; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines va Uzbekistan Airways; Kun.uz saytida",
+  "Humo qushi, Mars sayyorasi, uzum, ravon, Astana shahri, Rio shahri, kun bo‘yi, BMW va GAZ ta’minoti",
+  "M. Yusuf, L. Tolstoy, I. Karimov; XX asr, V asr, I jild; ip va igna, IP manzil, teleekranda"
 ];
 sentences.forEach(function (s) {
   tests.push([false, s, t.toCyrillic(s)]);

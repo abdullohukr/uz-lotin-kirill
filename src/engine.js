@@ -52,7 +52,7 @@
   // Clearly foreign (non-Uzbek) Latin words: letters or spellings Uzbek never uses,
   // or a capital inside the word (YouTube, iPhone, CadenzaX).
   var FOREIGN_LETTERS = /[wW]|[cC](?![hH])/;
-  var FOREIGN_SPELLING = /ph|ee(?!['\u02BB\u02BC\u2018\u2019])|gh|ck|[^aeiou'\u02BB\u02BC\u2018\u2019]le$|[^aeiouy'\u02BB\u02BC\u2018\u2019]y$/;
+  var FOREIGN_SPELLING = /ph|(?<!tel)ee(?!['\u02BB\u02BC\u2018\u2019])|gh|ck|[^aeiou'\u02BB\u02BC\u2018\u2019]le$|[^aeiouy'\u02BB\u02BC\u2018\u2019]y$/;
   function isStrongForeign(word) {
     if (FOREIGN_LETTERS.test(word)) return true;
     if (/[a-z][A-Z]/.test(word)) return true;                    // CamelCase
@@ -247,8 +247,28 @@
       return !!(weak[lw] || (lw.length > 3 && /s$/.test(lw) && weak[lw.slice(0, -1)]));
     }
     function isAcronym(word) {
-      return !!acronyms[word.toLowerCase()];
+      if (!acronyms[word.toLowerCase()]) return false;
+      // short ones only in capitals: VIP, SMS, IP - but "ip" is an Uzbek word (thread)
+      return word.length > 3 || (word.length > 1 && word === word.toUpperCase());
     }
+
+    // brand names (data/brands.json): single words with a case mode, and phrases
+    var brandWords = (exceptions.brands && exceptions.brands.words) || {};
+    var brandPhrases = {};
+    ((exceptions.brands && exceptions.brands.phrases) || []).forEach(function (p) {
+      (brandPhrases[p[0]] = brandPhrases[p[0]] || []).push(p);
+    });
+    function brandKey(w) { return w.toLowerCase().replace(/[\u2018\u2019\u02BB\u02BC`]/g, "'"); }
+    function isBrandWord(w) {
+      var mode = brandWords[brandKey(w)];
+      if (!mode) return false;
+      if (mode === "cap") return isUpper(w[0]);
+      if (mode === "caps") return w.length > 1 && w === w.toUpperCase();
+      return w === mode.slice(6);
+    }
+    var PHRASE_GAP = /^(?:[ \u00A0]|[ \u00A0]?[-.&+][ \u00A0]?|[ \u00A0]&[ \u00A0])$/;
+    // Latin letters with accents (Ülker, Müller, Citroën): such words stay Latin
+    var ACCENTED = /[\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F]/;
 
     var QUOTE_SPAN = /[«“„"]([^«»“”„"\n]{1,120})[»”“"]/g;
 
@@ -273,9 +293,23 @@
       }
       if (script === "lat" && opt.keepForeign) {
         toks.forEach(function (t) {
-          t.strong = isStrongForeign(t.w) || isAcronym(t.w);
+          t.strong = isStrongForeign(t.w) || isAcronym(t.w) || isBrandWord(t.w) ||
+            ACCENTED.test(text.charAt(t.s - 1)) || ACCENTED.test(text.charAt(t.e));
           t.foreign = t.strong || isWeakForeign(t.w);
           if (t.strong) t.keep = true;
+        });
+        // brand phrases: American Express, Turkish Airlines, Kun.uz
+        toks.forEach(function (t, i) {
+          var cands = brandPhrases[brandKey(t.w)];
+          if (!cands || !isUpper(t.w[0])) return;
+          cands.forEach(function (p) {
+            if (i + p.length > toks.length) return;
+            for (var k = 1; k < p.length; k++) {
+              if (brandKey(toks[i + k].w) !== p[k]) return;
+              if (!PHRASE_GAP.test(text.slice(toks[i + k - 1].e, toks[i + k].s))) return;
+            }
+            for (var k2 = 0; k2 < p.length; k2++) { toks[i + k2].keep = true; toks[i + k2].strong = true; toks[i + k2].foreign = true; }
+          });
         });
         // names in quotes
         QUOTE_SPAN.lastIndex = 0;
@@ -307,7 +341,9 @@
       toks.forEach(function (t) {
         if (t.keep) return;
         if (urls.length && inSpans(urls, t.s, t.e)) return;
-        var out = fn(t.w);
+        // a single capital letter before a dot is an initial (M. Yusuf), not a Roman numeral
+        var initial = script === "lat" && t.w.length === 1 && text.charAt(t.e) === ".";
+        var out = initial ? wordToCyrillic(t.w, true) : fn(t.w);
         if (out !== t.w) edits.push([t.s, t.e, out]);
       });
       return edits;
@@ -320,11 +356,11 @@
       return text;
     }
 
-    function wordToCyrillic(word) {
+    function wordToCyrillic(word, notRoman) {
       // Clearly foreign words and Roman numerals stay as is.
       if (opt.keepForeign && isStrongForeign(word)) return word;
       if (!opt.keepForeign && FOREIGN_LETTERS.test(word)) return word;
-      if (ROMAN_RE.test(word)) return word;
+      if (!notRoman && ROMAN_RE.test(word)) return word;
       var norm = normLatin(word);
       var key = latKey(norm);
       if (skip[key]) return word;

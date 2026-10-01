@@ -30,7 +30,7 @@ Private gLoaded As Boolean
 Private gL2C As Collection, gL2CStem As Collection
 Private gC2L As Collection, gC2LStem As Collection
 Private gUL2C As Collection, gUC2L As Collection, gSkip As Collection
-Private gWeak As Collection, gAcr As Collection
+Private gWeak As Collection, gAcr As Collection, gBrand As Collection, gPhr As Collection
 Private gMaxL2C As Long, gMaxC2L As Long
 Private gLugatStamp As String
 Private gTestN As Long, gTestFail As Long, gTestMsg As String
@@ -151,7 +151,12 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
             For k = cnt To 1 Step -1
                 If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) > 0 Then GoTo NextTok
                 tok = Mid$(t, starts(k), lens(k))
-                If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+                If toLat Then
+                    outS = WordToLat(tok)
+                Else
+                    ' a single letter before a dot is an initial (M. Yusuf), not a Roman numeral
+                    outS = WordToCyr(tok, lens(k) = 1 And Mid$(t, starts(k) + 1, 1) = ".")
+                End If
                 If StrComp(outS, tok, vbBinaryCompare) <> 0 Then
                     a = pr.Start + starts(k) - 1
                     b = a + lens(k)
@@ -321,7 +326,11 @@ Private Function ConvertText(ByVal s As String, ByVal toLat As Boolean) As Strin
     For k = cnt To 1 Step -1
         If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) = 0 Then
             tok = Mid$(s, starts(k), lens(k))
-            If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+            If toLat Then
+                outS = WordToLat(tok)
+            Else
+                outS = WordToCyr(tok, lens(k) = 1 And Mid$(s, starts(k) + 1, 1) = ".")
+            End If
             s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
         End If
     Next k
@@ -330,9 +339,11 @@ End Function
 
 ' ============================== words
 
-Private Function WordToCyr(ByVal w As String) As String
+Private Function WordToCyr(ByVal w As String, Optional ByVal notRoman As Boolean = False) As String
     Dim norm As String, key As String, pat As Long, v As String, L As Long, maxL As Long
-    If IsRoman(w) Then WordToCyr = w: Exit Function
+    If Not notRoman Then
+        If IsRoman(w) Then WordToCyr = w: Exit Function
+    End If
     If KEEP_FOREIGN Then
         If IsStrongForeign(w) Then WordToCyr = w: Exit Function
     ElseIf IsForeign(w) Then
@@ -577,19 +588,60 @@ Private Function IsStrongForeign(ByVal w As String) As Boolean
         End If
     Next i
     lw = LC(w): L = Len(lw)
-    If CHas(gAcr, lw) Then IsStrongForeign = True: Exit Function
+    If CHas(gAcr, lw) Then
+        ' short ones only in capitals (VIP, SMS, IP) - "ip" is an Uzbek word
+        If L > 3 Or (L > 1 And StrComp(w, UC(w), vbBinaryCompare) = 0) Then IsStrongForeign = True: Exit Function
+    End If
     If L < 4 Then Exit Function
     If InStr(1, lw, "ph", vbBinaryCompare) > 0 Or InStr(1, lw, "gh", vbBinaryCompare) > 0 Or _
        InStr(1, lw, "ck", vbBinaryCompare) > 0 Then IsStrongForeign = True: Exit Function
     i = InStr(1, lw, "ee", vbBinaryCompare)
     Do While i > 0
-        If Not IsApos(Mid$(lw, i + 2, 1)) Then IsStrongForeign = True: Exit Function
+        If Not IsApos(Mid$(lw, i + 2, 1)) And Not (i > 3 And Mid$(lw, i - 3, 3) = "tel") Then IsStrongForeign = True: Exit Function
         i = InStr(i + 1, lw, "ee", vbBinaryCompare)
     Loop
     p = Mid$(lw, L - 2, 1)
     If Right$(lw, 2) = "le" And InStr(1, "aeiou", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
     p = Mid$(lw, L - 1, 1)
     If Right$(lw, 1) = "y" And InStr(1, "aeiouy", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
+End Function
+
+Private Function BrandKey(ByVal w As String) As String
+    Dim i As Long, ch As String, r As String
+    w = LC(w)
+    For i = 1 To Len(w)
+        ch = Mid$(w, i, 1)
+        If IsApos(ch) Then r = r & "_" Else r = r & ch
+    Next i
+    BrandKey = r
+End Function
+
+' Brand name (data/brands.txt): "cap" = with a capital letter, "caps" = only in
+' capitals (BMW), "exact:X" = only spelled exactly X (vivo, UzA).
+Private Function IsBrandWord(ByVal w As String) As Boolean
+    Dim mode As String
+    If Not CGet(gBrand, BrandKey(w), mode) Then Exit Function
+    If mode = "cap" Then
+        IsBrandWord = IsUpperCh(Left$(w, 1))
+    ElseIf mode = "caps" Then
+        IsBrandWord = Len(w) > 1 And StrComp(w, UC(w), vbBinaryCompare) = 0
+    Else
+        IsBrandWord = (StrComp(w, Mid$(mode, 7), vbBinaryCompare) = 0)
+    End If
+End Function
+
+Private Function IsPhraseGap(ByVal g As String) As Boolean
+    g = Replace(g, ChrW(&HA0), " ")
+    Select Case g
+        Case " ", "-", ".", "&", "+", " -", "- ", " - ", " .", ". ", " . ", " &", "& ", " & ", " +", "+ ", " + "
+            IsPhraseGap = True
+    End Select
+End Function
+
+Private Function IsAccented(ByVal ch As String) As Boolean
+    Dim c As Long
+    c = U16(ch)
+    IsAccented = (c >= &HC0 And c <= &H24F And c <> &HD7 And c <> &HF7)
 End Function
 
 ' English word from the list (Seven, Gold, Smarts) - only counts inside short names.
@@ -612,9 +664,38 @@ Private Function ForeignMask(ByVal t As String, starts() As Long, lens() As Long
     ReDim strong(1 To cnt): ReDim foreign(1 To cnt)
     For k = 1 To cnt
         strong(k) = IsStrongForeign(Mid$(t, starts(k), lens(k)))
+        If Not strong(k) Then strong(k) = IsBrandWord(Mid$(t, starts(k), lens(k)))
+        ' next to a letter with an accent (Ulker with U-umlaut, Citroen with e-diaeresis)
+        If Not strong(k) And starts(k) > 1 Then strong(k) = IsAccented(Mid$(t, starts(k) - 1, 1))
+        If Not strong(k) Then strong(k) = IsAccented(Mid$(t, starts(k) + lens(k), 1))
         foreign(k) = strong(k)
         If Not strong(k) Then foreign(k) = IsWeakForeign(Mid$(t, starts(k), lens(k)))
         If strong(k) Then Mid$(m, starts(k), lens(k)) = String$(lens(k), "1")
+    Next k
+    ' brand phrases: American Express, Turkish Airlines, Kun.uz
+    Dim cands As String, ph() As String, pw() As String, c As Long, q As Long, ok As Boolean
+    For k = 1 To cnt
+        If IsUpperCh(Mid$(t, starts(k), 1)) Then
+            If CGet(gPhr, BrandKey(Mid$(t, starts(k), lens(k))), cands) Then
+                ph = Split(cands, "|")
+                For c = LBound(ph) To UBound(ph)
+                    pw = Split(ph(c), " ")
+                    ok = (k + UBound(pw) <= cnt)
+                    q = 1
+                    Do While ok And q <= UBound(pw)
+                        If BrandKey(Mid$(t, starts(k + q), lens(k + q))) <> pw(q) Then ok = False
+                        If ok Then ok = IsPhraseGap(Mid$(t, starts(k + q - 1) + lens(k + q - 1), starts(k + q) - starts(k + q - 1) - lens(k + q - 1)))
+                        q = q + 1
+                    Loop
+                    If ok Then
+                        For q = 0 To UBound(pw)
+                            strong(k + q) = True: foreign(k + q) = True
+                            Mid$(m, starts(k + q), lens(k + q)) = String$(lens(k + q), "1")
+                        Next q
+                    End If
+                Next c
+            End If
+        End If
     Next k
     ' short names in quotes
     opens = ChrW(&HAB) & ChrW(&H201C) & ChrW(&H201E) & """"
@@ -898,6 +979,7 @@ Private Sub LoadAll()
         Set gC2L = New Collection: Set gC2LStem = New Collection
         Set gUL2C = New Collection: Set gUC2L = New Collection: Set gSkip = New Collection
         Set gWeak = New Collection: Set gAcr = New Collection
+        Set gBrand = New Collection: Set gPhr = New Collection
         gMaxL2C = 0: gMaxC2L = 0
         LoadData
         gLoaded = True
@@ -995,6 +1077,31 @@ Private Sub AddWeak(ByVal words As String)
     a = Split(words, " ")
     For i = LBound(a) To UBound(a)
         If Len(a(i)) > 0 Then CAdd gWeak, a(i), "1"
+    Next i
+End Sub
+
+' "key=mode key=mode ..."
+Private Sub AddBrand(ByVal items As String)
+    Dim a() As String, i As Long, e As Long
+    a = Split(items, " ")
+    For i = LBound(a) To UBound(a)
+        e = InStr(1, a(i), "=")
+        If e > 0 Then CAdd gBrand, Left$(a(i), e - 1), Mid$(a(i), e + 1)
+    Next i
+End Sub
+
+' "word word|word word word" - phrases, indexed by their first word
+Private Sub AddPhrase(ByVal items As String)
+    Dim a() As String, i As Long, first As String, old As String
+    a = Split(items, "|")
+    For i = LBound(a) To UBound(a)
+        first = Split(a(i), " ")(0)
+        If CGet(gPhr, first, old) Then
+            gPhr.Remove first
+            gPhr.Add old & "|" & a(i), first
+        Else
+            gPhr.Add a(i), first
+        End If
     Next i
 End Sub
 
@@ -3117,6 +3224,40 @@ Private Sub UzForeign4()
     AddWeak "voyages vroom vulnerability vulnerable vulture vultures xanax xander xavier xbox xena xerox xev xia xian xiang xiao xie xiii xin xing xiu yaah yacht yachts yada yadav yagyu yagyuu yahoo yakuza yale yamaguchi yamamoto yamato yamazaki yams yank yanked yankee yankees yanking yanks yao yapping yard yards yarn yasir yasmin yates yau yay yea yeah year yearbook yearly yearn yearning yearns years yeast yee yeh yell yelled yelling yells yelp yelping yelps yemen yeo yeon yeong yes yesterday yet yeti yeung yiddish yield yielded yields yikes ying yip yippee yoda"
     AddWeak "yoga yoghurt yogurt yoke yoko yolanda yolk yonder yonkers yoo yoon yorker yorkers yorkshire yosemite yoshiko yoshio yoshioka you young younger youngest youngster youngsters your youre yourfather yourjob yours yourself yourselves yous youse youth youthful youths youtube yuen yugo yugoslavia yui yuji yuka yukiko yuko yukon yul yum yume yumi yummy yup yuri yuriko yusef yusuke yuu yuuki yves yvette yvonne zach zachary zagreb zak zander zane zapata zapped zapping zara zeal zealand zebra zebras zed zedd zee zeke zelda zen zenith zeo zephyr zeppelin zeroes zeros zest zeta zeus"
     AddWeak "zev zeynep zhaan zhan zhang zhao zhen zheng zhi zhong zhou zhu zig ziggy zilch zillion zimmer zimmerman zion zip zipper zips zit ziva zod zoe zoey zola zombie zombies zone zones zoning zoo zoom zoos zordon zorn zorro zou zulu zurich"
+    AddBrand "abarth=cap abbott=cap accent=cap accor=cap accord=cap acer=cap acrobat=cap actimel=cap activia=cap activision=cap actros=cap acura=cap adidas=cap adobe=cap aegean=cap aeromexico=cap afp=caps afterpay=cap airasia=exact:AirAsia airbaltic=exact:airBaltic airbnb=cap airbus=cap airpods=exact:AirPods airtag=exact:AirTag ajet=exact:AJet akbank=cap alcatel=cap alexa=cap alibaba=cap aliexpress=exact:AliExpress alipay=cap alitalia=cap almera=cap almette=cap aloft=cap alphabet=cap alphard=cap alpina=cap altima=cap amarok=cap amazon=cap amd=caps amex=cap andaz=cap android=cap angular=cap anthropic=cap ap=caps apple=cap aquafina=cap aramco=cap arby_s=cap arcelik=cap arkana=cap arla=cap arm=caps armani=cap arrizo=cap arteon=cap asiana=cap"
+    AddBrand "asics=cap astrazeneca=exact:AstraZeneca asus=cap atlassian=cap atto=cap auchan=cap audi=cap autocad=exact:AutoCAD autodesk=cap avalon=cap avast=cap avene=cap aventador=cap aveo=cap avianca=cap aviasales=cap avito=cap avon=cap aws=caps axe=cap azure=cap baidu=cap balenciaga=cap barbie=cap barclays=cap barilla=cap battlefield=cap bayer=cap bbc=caps bbva=caps beats=cap beeline=cap beko=cap belavia=cap bellissimo=cap benetton=cap bentayga=cap bentley=cap benz=cap berlingo=cap bershka=cap bilibili=cap biman=cap binance=cap bing=cap bioderma=cap birkenstock=cap bitbucket=cap bitcoin=cap bitfinex=cap bitget=cap bitrix=cap blackberry=exact:BlackBerry blackrock=exact:BlackRock blackview=cap blazer=cap blizzard=cap bloomberg=cap bmw=caps bnb=caps"
+    AddBrand "boeing=cap bombardier=cap bonaqua=cap bonduelle=cap booking=cap bosch=cap bose=cap botim=cap bounty=cap bourjois=cap bp=caps breitling=cap bronco=cap brother=cap bugatti=cap buick=cap bulgari=cap bumble=cap burberry=cap burn=cap bvlgari=cap bybit=cap byd=caps byredo=cap bytedance=exact:ByteDance cadbury=cap caddy=cap cadillac=cap caixabank=exact:CaixaBank calve=cap calzedonia=cap camaro=cap camay=cap camry=cap candy=cap canon=cap canva=cap capcut=exact:CapCut captiva=cap cardano=cap careem=cap carlsberg=cap carnival=cap carrefour=cap carrier=cap cartier=cap casio=cap caterpillar=cap catrice=cap caudalie=cap cayenne=cap celine=cap cerato=cap cerave=exact:CeraVe chainlink=cap challenger=cap chanel=cap changan=cap charger=cap chase=cap"
+    AddBrand "chatgpt=exact:ChatGPT cheerios=cap cheetos=cap cherokee=cap chery=cap chevrolet=cap chevron=cap chevy=cap chipotle=cap chiquita=cap chopard=cap chrome=cap chromebook=cap chrysler=cap cinnabon=cap cisco=cap citi=cap citibank=cap citizen=cap citroen=cap civic=cap clarins=cap clarks=cap claude=cap click=cap clinique=cap clio=cap cloudflare=cap clubhouse=cap cnbc=caps cnn=caps cobalt=cap codeforces=cap coinbase=cap coke=cap colgate=cap colin_s=cap columbia=cap commerzbank=cap compass=cap condor=cap conrad=cap contact=cap converse=cap coolray=cap copilot=cap corolla=cap corsa=cap corsair=cap corvette=cap costco=cap countryman=cap coursera=cap courtyard=cap creta=cap crocs=cap cruze=cap cullinan=cap cupra=cap cyberpunk=cap"
+    AddBrand "cybertruck=cap dacia=cap daewoo=cap daf=caps daihatsu=cap daikin=cap damas=cap danone=cap dargo=cap dasani=cap davidoff=cap dbx=caps debian=cap deepseek=exact:DeepSeek defacto=exact:DeFacto defender=cap deliveroo=cap dell=cap delonghi=cap depop=cap dhl=caps diablo=cap digitalocean=exact:DigitalOcean dilmah=cap dior=cap dirol=cap discord=cap discover=cap discovery=cap disney=cap django=cap dji=caps doblo=cap docker=cap dodge=cap dogecoin=cap dole=cap domestos=cap domino_s=cap dongfeng=cap doogee=cap doordash=exact:DoorDash doritos=cap dota=cap doubletree=exact:DoubleTree douyin=cap dove=cap dropbox=cap drupal=cap ducati=cap ducato=cap dunkin=cap duolingo=cap durango=cap duster=cap dyson=cap ea=caps easyjet=exact:easyJet ebay=exact:eBay ebrd=caps"
+    AddBrand "ecco=cap edge=cap edx=exact:edX egyptair=exact:EgyptAir elantra=cap electrolux=cap elseve=cap embraer=cap emgrand=cap emirates=cap epica=cap epson=cap equinox=cap erste=cap escalade=cap escape=cap eset=caps espn=caps esprit=cap ethereum=cap etihad=cap etoro=exact:eToro etsy=cap eucerin=cap euronews=cap eurosport=cap eurowings=cap evernote=cap evian=cap evoque=cap evos=cap excel=cap exeed=cap expedia=cap expedition=cap explorer=cap express=cap exxonmobil=exact:ExxonMobil faceapp=exact:FaceApp facebook=cap facetime=exact:FaceTime fairmont=cap fairy=cap fallout=cap fanta=cap farfetch=cap faw=caps fedex=exact:FedEx fendi=cap fenty=cap ferrari=cap ferrero=cap fiat=cap fidelity=cap fiesta=cap figma=cap fila=cap finnair=cap firebase=cap firefox=cap"
+    AddBrand "fitbit=cap fitch=cap flask=cap flipkart=cap fluence=cap flyadeal=cap flyarystan=exact:FlyArystan flydubai=cap flynas=cap focus=cap forbes=cap ford=cap forester=cap forex=cap fortnite=cap fortune=cap fortuner=cap forza=cap fujifilm=cap furla=cap fusion=cap gac=caps galant=cap galaxy=cap garageband=exact:GarageBand garmin=cap garnier=cap gatorade=cap geely=cap geforce=exact:GeForce gemini=cap genesis=cap gentra=cap geox=cap getz=cap ghost=cap gillette=cap git=cap github=exact:GitHub gitlab=exact:GitLab giulia=cap givenchy=cap glossier=cap glovo=cap gmail=cap gmc=caps godaddy=exact:GoDaddy gojek=cap golang=cap google=cap gopro=exact:GoPro gorenje=cap gpt=caps grab=cap grammarly=cap gree=cap greenfield=cap grok=cap gsk=caps gta=caps"
+    AddBrand "gucci=cap guerlain=cap haier=cap halkbank=cap halo=cap hardee_s=cap haribo=cap hasbro=cap haval=cap hbo=caps hearthstone=cap heineken=cap heinz=cap hellmann_s=cap henkel=cap hepsiburada=cap hermes=cap heroku=cap hershey_s=cap hetzner=cap higer=cap highlander=cap hilton=cap hilux=cap hino=cap hisense=cap hitachi=cap hitman=cap hochland=cap hofmann=cap homepod=exact:HomePod honda=cap honeywell=cap hongqi=cap honor=cap hotmail=cap hotpoint=cap howo=cap hp=caps hsbc=caps htc=caps huawei=cap hublot=cap huggies=cap hulu=cap humans=cap huobi=cap huracan=cap hyatt=cap hyperx=exact:HyperX hyundai=cap ibis=cap ibm=caps icbc=caps icloud=exact:iCloud ikea=cap illustrator=cap illy=cap imac=exact:iMac imessage=exact:iMessage"
+    AddBrand "imf=caps impreza=cap indesign=exact:InDesign indesit=cap indigo=exact:IndiGo indrive=exact:inDrive indriver=exact:inDriver infiniti=cap infinix=cap ing=caps inshot=exact:InShot insignia=cap instagram=cap intel=cap intellij=exact:IntelliJ intercontinental=exact:InterContinental intimissimi=cap ioniq=cap ios=exact:iOS ipad=exact:iPad ipados=exact:iPadOS iphone=exact:iPhone ipod=exact:iPod isbank=cap isuzu=cap itel=cap itunes=exact:iTunes iveco=cap jac=caps jacobs=cap jaecoo=cap javascript=exact:JavaScript jbl=caps jcb=caps jeep=cap jenkins=cap jet=cap jetblue=exact:JetBlue jetour=cap jetstar=cap jetta=cap jira=cap jolion=cap jollibee=cap joom=cap joomla=cap jpmorgan=exact:JPMorgan juke=cap jumeirah=cap jupyter=cap kaggle=cap kahoot=cap kaiyi=cap kakaotalk=exact:KakaoTalk kappa=cap kaptur=cap kaspi=cap kawasaki=cap kcell=cap kellogg_s=cap"
+    AddBrand "kempinski=cap kenwood=cap kenzo=cap kerastase=cap keynote=cap kfc=caps kia=cap kiehl_s=cap kilian=cap kinder=cap kindle=cap kitkat=exact:KitKat klarna=cap klm=caps knorr=cap kodak=cap kodiaq=cap koleos=cap komatsu=cap kona=cap kotlin=cap koton=cap krups=cap ktm=caps kubernetes=cap kucoin=exact:KuCoin kuga=cap kwai=cap kyocera=cap l_oreal=exact:L'Oreal labo=cap lacetti=cap lacoste=cap lactalis=cap lalique=cap lamborghini=cap lamoda=cap lancer=cap lancia=cap lancome=cap laravel=cap latam=caps lattafa=cap lavazza=cap lay_s=cap lazada=cap leapmotor=cap leetcode=exact:LeetCode lefties=cap lego=cap lenovo=cap levi_s=cap lexus=cap lg=caps lidl=cap liebherr=cap lifan=cap lifebuoy=cap lightroom=cap likee=cap"
+    AddBrand "lincoln=cap lindt=cap linkedin=exact:LinkedIn linux=cap lipton=cap litecoin=cap lloyds=cap loewe=cap logitech=cap longines=cap lotte=cap lotus=cap louboutin=cap lucid=cap lufthansa=cap lyft=cap mac=caps macan=cap macbook=exact:MacBook macos=exact:macOS maersk=cap magento=cap maggi=cap malibu=cap mancera=cap marriott=cap marvel=cap maserati=cap mastercard=cap matiz=cap mattel=cap maverick=cap mavi=cap maybach=cap maybelline=cap mazda=cap mbank=exact:mBank mcafee=exact:McAfee mcdonald_s=exact:McDonald's mclaren=exact:McLaren mediapark=cap mediatek=exact:MediaTek medtronic=cap megane=cap meituan=cap meizu=cap mentos=cap mercedes=cap merci=cap mercure=cap messenger=cap meta=cap metamask=exact:MetaMask mexc=caps microsoft=cap midea=cap midjourney=cap miele=cap mikrotik=exact:MikroTik milka=cap"
+    AddBrand "minecraft=cap mirinda=cap missoni=cap mitsubishi=cap mizuho=cap mobiuz=cap moderna=cap mohave=cap mokka=cap moncler=cap mondeo=cap moneygram=exact:MoneyGram mongodb=exact:MongoDB monjaro=cap monster=cap montale=cap montblanc=cap montero=cap monza=cap moodle=cap moody_s=cap moroccanoil=cap moschino=cap motorola=cap moulinex=cap movenpick=cap mozilla=cap msi=caps mufg=caps murano=cap mustang=cap mysql=exact:MySQL mytaxi=exact:MyTaxi nabeglavi=cap namecheap=cap nando_s=cap nasdaq=cap natixis=cap natwest=exact:NatWest navara=cap naver=cap nbc=caps nescafe=cap nespresso=cap nesquik=cap nestea=cap nestle=cap neteller=cap netflix=cap netgear=cap netlify=cap neutrogena=cap nexia=cap nike=cap nikon=cap nintendo=cap nio=cap nissan=cap nivea=cap nodejs=exact:NodeJS"
+    AddBrand "nokia=cap nomura=cap nongshim=cap nordea=cap norton=cap norwegian=cap notcoin=cap notion=cap novartis=cap novotel=cap nutella=cap nuxe=cap nvidia=cap nyse=caps nyx=caps octavia=cap oculus=cap office=cap okx=caps olaplex=cap olx=caps olympus=cap omoda=cap onedrive=exact:OneDrive onenote=exact:OneNote oneplus=exact:OnePlus onix=cap ookla=cap opel=cap openai=exact:OpenAI oppo=cap optima=cap oracle=cap orange=cap orbit=cap oreo=cap oriflame=cap otokar=cap outback=cap outlander=cap outlook=cap overwatch=cap ovh=caps oysho=cap pajero=cap palisade=cap palmolive=cap pampers=cap panamera=cap panasonic=cap pantene=cap pathfinder=cap payme=cap paynet=cap payoneer=cap paypal=exact:PayPal paytm=cap pegasus=cap penti=cap pepsi=cap"
+    AddBrand "pepsico=exact:PepsiCo perfectum=cap perplexity=cap perrier=cap persil=cap petronas=cap peugeot=cap pfizer=cap phantom=cap philips=cap phonepe=exact:PhonePe photoshop=cap php=caps pia=caps picanto=cap pickwick=cap picsart=exact:PicsArt pinduoduo=cap pinterest=cap pixar=cap pixel=cap pko=caps playstation=exact:PlayStation poco=cap pokemon=cap polaroid=cap polestar=cap polkadot=cap popeyes=cap porsche=cap postgresql=exact:PostgreSQL postman=cap powerade=cap powerpoint=exact:PowerPoint prada=cap prado=cap primark=cap pringles=cap prius=cap protex=cap protonmail=exact:ProtonMail pubg=caps pullman=cap punto=cap pycharm=exact:PyCharm python=cap pytorch=exact:PyTorch qantas=cap qashqai=cap qnb=caps quaker=cap qualcomm=cap quattro=cap quizlet=cap quora=cap rabobank=cap radisson=cap rado=cap raffaello=cap raffles=cap"
+    AddBrand "raiffeisen=cap raiffeisenbank=cap rakuten=cap ramada=cap rambler=cap ranger=cap rasasi=cap rauch=cap rav=caps razer=cap react=cap realme=cap reddit=cap redis=cap redken=cap redmi=cap reebok=cap remini=cap renault=cap replit=cap reuters=cap revolut=cap rexona=cap ricoh=cap rimmel=cap ripple=cap rivian=cap rixos=cap robinhood=cap roblox=cap roche=cap rockstar=cap rog=caps roku=cap rolex=cap roshen=cap rotana=cap rowenta=cap rwandair=exact:RwandAir ryanair=cap saab=cap safeguard=cap salamair=exact:SalamAir salesforce=cap salomon=cap samsung=cap sandero=cap sandisk=exact:SanDisk sanofi=cap sap=caps sas=caps saudia=cap sbarro=cap scania=cap scarlett=cap schwarzkopf=cap schweppes=cap seagate=cap seat=cap segafredo=cap"
+    AddBrand "seiko=cap seltos=cap sennheiser=cap sephora=cap sequoia=cap shacman=cap sharp=cap shazam=cap shein=cap shell=cap sheraton=cap shiseido=cap shivaki=cap shopee=cap shopify=cap siemens=cap sienna=cap silverado=cap simcity=exact:SimCity sinotruk=cap skechers=cap skittles=cap skoda=cap skrill=cap skype=cap skyrim=cap skyscanner=cap slack=cap smeg=cap snapchat=cap snapdragon=cap snapseed=cap snickers=cap sofitel=cap solaris=cap sony=cap sorento=cap soundcloud=exact:SoundCloud southwest=cap spacex=exact:SpaceX spar=caps spark=cap speedtest=cap sportage=cap spotify=cap sprite=cap sqlite=exact:SQLite square=cap ssangyong=exact:SsangYong stackoverflow=exact:StackOverflow standoff=cap starbucks=cap starcraft=exact:StarCraft starex=cap staria=cap starlink=cap starlux=cap steam=cap stelvio=cap stinger=cap"
+    AddBrand "stradivarius=cap stripe=cap subaru=cap suburban=cap subway=cap sumitomo=cap sunsilk=cap supabase=cap superb=cap superstar=cap surface=cap sutas=cap suzuki=cap swarovski=cap swatch=cap swedbank=cap swift=cap swiss=cap swissotel=cap switch=cap symfony=cap syoss=cap tabby=cap tableau=cap tacoma=cap tahoe=cap talabat=cap tamtam=exact:TamTam taobao=cap tarom=cap taycan=cap tchibo=cap tcl=caps teams=cap teana=cap tecno=cap tefal=cap tekken=cap telegram=cap telluride=cap temu=cap tencent=cap tensorflow=exact:TensorFlow teramont=cap tesco=cap tesla=cap tether=cap tetley=cap tetris=cap teva=cap texnomart=cap tezenis=cap thinkpad=exact:ThinkPad threads=cap tide=cap tiffany=cap tiggo=cap tiguan=cap tiida=cap tiktok=exact:TikTok"
+    AddBrand "timberland=cap timotei=cap tinder=cap tipo=cap tissot=cap tnt=caps toblerone=cap toncoin=cap tonkeeper=cap topshop=cap torku=cap toshiba=cap totalenergies=exact:TotalEnergies touareg=cap touran=cap toyota=cap tracker=cap trailblazer=cap transcend=cap transferwise=exact:TransferWise travelodge=cap traverse=cap trello=cap trendyol=cap trezor=cap trident=cap tripadvisor=cap tron=caps tropicana=cap truecaller=cap tuborg=cap tucson=cap tugella=cap tui=caps tumblr=cap tunisair=cap turkcell=cap twinings=cap twitch=cap twitter=cap twix=cap typescript=exact:TypeScript uber=cap ubiquiti=cap ubisoft=cap ubs=caps ubuntu=cap ucell=cap udemy=cap ugg=caps ulefone=cap ulker=cap umbro=cap unicredit=exact:UniCredit unilever=cap unionpay=exact:UnionPay uniqlo=cap unity=cap ups=caps uriage=cap"
+    AddBrand "urus=cap usdc=caps usdt=caps uza=exact:UzA uzcard=cap uzmobile=cap vakifbank=exact:VakifBank valentino=cap valio=cap valorant=cap valve=cap vanguard=cap vanish=cap vans=cap vantage=cap velar=cap vellfire=cap venmo=cap venza=cap vercel=cap verizon=cap versace=cap vespa=cap vestel=cap viber=cap vichy=cap vinted=cap virgin=cap visa=cap vitek=cap vito=cap vivo=cap vodafone=cap volkswagen=cap volotea=cap volvo=cap voyah=cap vsco=caps vueling=cap vw=caps walmart=cap warcraft=cap watchos=exact:watchOS waze=cap webex=cap webstorm=exact:WebStorm wechat=exact:WeChat weibo=cap wella=cap wendy_s=cap westin=cap whatsapp=exact:WhatsApp whirlpool=cap wikipedia=cap wildberries=cap windows=cap wise=cap wix=cap wizz=cap wolt=cap"
+    AddBrand "word=cap wordpress=exact:WordPress wrangler=cap wrigley_s=cap wyndham=cap xai=exact:xAI xbox=cap xc=caps xcode=cap xerox=cap xiaomi=cap xpeng=cap xrp=caps yahoo=cap yamaha=cap yango=cap yaris=cap yeezy=cap youku=cap youtube=exact:YouTube yutong=cap zafira=cap zalando=cap zeekr=cap zelda=cap zelle=cap zenfone=cap zoom=cap zte=caps"
+    AddPhrase "visa electron|american express|china unionpay|diners club|western union|ria money transfer|apple pay|google pay|samsung pay|wechat pay|tbc bank|tenge bank|ziraat bank|j p morgan|goldman sachs|morgan stanley|deutsche bank|bnp paribas|credit suisse|wells fargo|bank of america|standard chartered|emirates nbd|al rajhi|kaspi bank|halyk bank|dow jones|visa inc|mastercard inc|uzbekistan airways|air astana|etihad airways|qatar airways|turkish airlines|air france|british airways|ita airways|austrian airlines|wizz air|american airlines"
+    AddPhrase "delta air lines|united airlines|air canada|singapore airlines|cathay pacific|korean air|japan airlines|china southern|china eastern|air china|hainan airlines|air india|air arabia|gulf air|oman air|kuwait airways|royal jordanian|ethiopian airlines|kenya airlines|azerbaijan airlines|somon air|air manas|avia traffic|centrum air|silk avia|mercedes benz|alfa romeo|rolls royce|aston martin|jaguar land rover|land rover|range rover|great wall|li auto|golden dragon|john deere|harley davidson|land cruiser|santa fe|x trail"
+    AddPhrase "cr v|model s|model x|model y|atlas pro|song plus|han ev|macbook air|macbook pro|mac mini|apple watch|apple tv|app store|google maps|google drive|google docs|google translate|google play|play market|youtube music|hewlett packard|premiere pro|after effects|unreal engine|red hat|prime video|amazon prime|epic games|electronic arts|counter strike|call of duty|tesla motors|uzum market|uzum bank|uzum nasiya|booking com|khan academy|google meet|opera mini|uc browser"
+    AddPhrase "at t|t mobile|under armour|new balance|the north face|north face|lee cooper|calvin klein|tommy hilfiger|ralph lauren|polo ralph lauren|hugo boss|giorgio armani|emporio armani|louis vuitton|christian dior|dolce gabbana|yves saint laurent|saint laurent|patek philippe|audemars piguet|tag heuer|ray ban|pull bear|massimo dutti|lc waikiki|oral b|head shoulders|estee lauder|the body shop|la roche posay|johnson johnson|procter gamble|coca cola|dr pepper|red bull|costa coffee|tim hortons|mars inc|kit kat"
+    AddPhrase "alpen gold|chupa chups|ritter sport|burger king|pizza hut|papa john_s|taco bell|chick fil a|shake shack|five guys|feed up|les ailes|radisson blu|ritz carlton|four seasons|holiday inn|best western|hilton garden inn|samsung electronics|bbc news|al jazeera|sky news|fox news|abc news|associated press|the economist|financial times|the guardian|the new york times|new york times|the washington post|washington post|the times|daily mail|national geographic|discovery channel|animal planet|kun uz|daryo uz|gazeta uz"
+    AddPhrase "podrobno uz|uza uz|euronews uzbek|amazon web services|tesla inc|walt disney|warner bros|dc comics|hello kitty|saudi aramco|siemens energy|general electric|emirates skycargo|visa card|master card|grand cherokee|continental gt|echo dot|fire tv|mi band|huawei mate|honor magic|galaxy note|galaxy tab|galaxy watch|galaxy buds|vision pro|final cut pro|harman kardon|bang olufsen|xbox series|nintendo switch|konica minolta|western digital|tp link|d link|huawei cloud|node js|vue js|spring boot"
+    AddPhrase "visual studio|vs code|intellij idea|android studio|google cloud|power bi|hugging face|stack overflow|google classroom|mail ru|jd com|line pay|clash of clans|clash royale|brawl stars|pubg mobile|free fire|genshin impact|among us|candy crush|subway surfers|angry birds|pac man|super mario|pokemon go|league of legends|world of warcraft|apex legends|assassin_s creed|far cry|need for speed|mortal kombat|street fighter|the witcher|elden ring|dark souls|gears of war|gran turismo|the sims|rocket league"
+    AddPhrase "fall guys|mobile legends|clash mini|hamster kombat|lot polish airlines|tap air portugal|aer lingus|brussels airlines|air serbia|croatia airlines|bulgaria air|air moldova|georgian airways|buta airways|iran air|mahan air|pakistan international airlines|srilankan airlines|thai airways|vietnam airlines|malaysia airlines|garuda indonesia|philippine airlines|cebu pacific|eva air|china airlines|air busan|jeju air|air new zealand|virgin atlantic|virgin australia|copa airlines|air europa|royal air maroc|air algerie|kenya airways|south african airways|middle east airlines|jazeera airways|nile air"
+End Sub
+
+Private Sub UzForeign5()
+    AddPhrase "air cairo|fly baghdad|bank of china|china construction bank|credit agricole|societe generale|intesa sanpaolo|abn amro|danske bank|otp bank|garanti bbva|yapi kredi|emirates islamic|dubai islamic bank|abu dhabi islamic bank|kuwait finance house|islamic development bank|asian development bank|world bank|charles schwab|interactive brokers|apple card|google wallet|kaspi gold|freedom finance|cash app|gate io|trust wallet|shiba inu|the ordinary|tom ford|jo malone|al haramain|arabian oud|swiss arabian|paco rabanne|carolina herrera|yves rocher|max factor|huda beauty"
+    AddPhrase "fenty beauty|too faced|urban decay|anastasia beverly hills|charlotte tilbury|rare beauty|gliss kur|old spice|hugo boss bottled|narciso rodriguez|jean paul gaultier|g shock|daniel wellington|michael kors|kate spade|united colors of benetton|marks spencer|river island|off white|stone island|canada goose|dr martens|hush puppies|armani exchange|max mara|bottega veneta|miu miu|jimmy choo|christian louboutin|manolo blahnik|victoria_s secret|air jordan|air max|air force|adidas originals|stan smith|maxwell house|ahmad tea|brooke bond|fuse tea"
+    AddPhrase "san pellegrino|pure life|minute maid|del monte|corn flakes|nature valley|m m_s|tic tac|hubba bubba|kinder surprise|choco pie|shin ramyun|uncle ben_s|gallina blanca|carl_s jr|dairy queen|baskin robbins|krispy kreme|panda express|little caesars|texas chicken|black star burger|waldorf astoria|st regis|jw marriott|le meridien|mandarin oriental|shangri la|burj al arab|crowne plaza|hampton inn|embassy suites|days inn|premier inn|hyatt regency|park hyatt"
 End Sub
 
 Private Sub LoadData()
@@ -3129,6 +3270,7 @@ Private Sub LoadData()
     UzForeign2
     UzForeign3
     UzForeign4
+    UzForeign5
 End Sub
 
 Private Sub UzTests1()
@@ -3156,14 +3298,20 @@ Private Sub UzTests1()
     T True, "{041B}{0438}{043D}{043A}: https://islamqa.info/ar/answers/332928 {0432}{0430} www.savodxon.uz, ism.familiya@example.com {0451}{0437}{0438}{043D}{0433}", "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"
     T False, "bozorda {00AB}Smarts Vey{00BB}, {00AB}Gold Kvest{00BB} va {00AB}Seven Daymond{00BB} kabi, {00AB}CADENZAX MUSIC{00BB}, {00AB}CadenzaX music{00BB}, maxsus {00AB}VIP{00BB} darajalar", "{0431}{043E}{0437}{043E}{0440}{0434}{0430} {00AB}Smarts Vey{00BB}, {00AB}Gold Kvest{00BB} {0432}{0430} {00AB}Seven Daymond{00BB} {043A}{0430}{0431}{0438}, {00AB}CADENZAX MUSIC{00BB}, {00AB}CadenzaX music{00BB}, {043C}{0430}{0445}{0441}{0443}{0441} {00AB}VIP{00BB} {0434}{0430}{0440}{0430}{0436}{0430}{043B}{0430}{0440}"
     T True, "{0431}{043E}{0437}{043E}{0440}{0434}{0430} {00AB}Smarts Vey{00BB}, {00AB}Gold Kvest{00BB} {0432}{0430} {00AB}Seven Daymond{00BB} {043A}{0430}{0431}{0438}, {00AB}CADENZAX MUSIC{00BB}, {00AB}CadenzaX music{00BB}, {043C}{0430}{0445}{0441}{0443}{0441} {00AB}VIP{00BB} {0434}{0430}{0440}{0430}{0436}{0430}{043B}{0430}{0440}", "bozorda {00AB}Smarts Vey{00BB}, {00AB}Gold Kvest{00BB} va {00AB}Seven Daymond{00BB} kabi, {00AB}CADENZAX MUSIC{00BB}, {00AB}CadenzaX music{00BB}, maxsus {00AB}VIP{00BB} darajalar"
-    T False, "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online", "{043F}{043B}{0430}{0442}{0444}{043E}{0440}{043C}{0430}{043B}{0430}{0440}{0438}{0434}{0430} (Apple Music, YouTube {0432}{0430} {04B3}.{043A}.) Google, Facebook, iPhone, {0422}{0435}{043B}{0435}{0433}{0440}{0430}{043C}, online"
-    T True, "{043F}{043B}{0430}{0442}{0444}{043E}{0440}{043C}{0430}{043B}{0430}{0440}{0438}{0434}{0430} (Apple Music, YouTube {0432}{0430} {04B3}.{043A}.) Google, Facebook, iPhone, {0422}{0435}{043B}{0435}{0433}{0440}{0430}{043C}, online", "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online"
+    T False, "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online", "{043F}{043B}{0430}{0442}{0444}{043E}{0440}{043C}{0430}{043B}{0430}{0440}{0438}{0434}{0430} (Apple Music, YouTube {0432}{0430} {04B3}.{043A}.) Google, Facebook, iPhone, Telegram, online"
+    T True, "{043F}{043B}{0430}{0442}{0444}{043E}{0440}{043C}{0430}{043B}{0430}{0440}{0438}{0434}{0430} (Apple Music, YouTube {0432}{0430} {04B3}.{043A}.) Google, Facebook, iPhone, Telegram, online", "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online"
     T False, "men ham sport internet son top mana film massa proton Napoleon bee{2019}tibor, QR kod, yer sathi, inshootlar", "{043C}{0435}{043D} {04B3}{0430}{043C} {0441}{043F}{043E}{0440}{0442} {0438}{043D}{0442}{0435}{0440}{043D}{0435}{0442} {0441}{043E}{043D} {0442}{043E}{043F} {043C}{0430}{043D}{0430} {0444}{0438}{043B}{044C}{043C} {043C}{0430}{0441}{0441}{0430} {043F}{0440}{043E}{0442}{043E}{043D} {041D}{0430}{043F}{043E}{043B}{0435}{043E}{043D} {0431}{0435}{044D}{044A}{0442}{0438}{0431}{043E}{0440}, {049A}{0420} {043A}{043E}{0434}, {0435}{0440} {0441}{0430}{0442}{04B3}{0438}, {0438}{043D}{0448}{043E}{043E}{0442}{043B}{0430}{0440}"
     T True, "{043C}{0435}{043D} {04B3}{0430}{043C} {0441}{043F}{043E}{0440}{0442} {0438}{043D}{0442}{0435}{0440}{043D}{0435}{0442} {0441}{043E}{043D} {0442}{043E}{043F} {043C}{0430}{043D}{0430} {0444}{0438}{043B}{044C}{043C} {043C}{0430}{0441}{0441}{0430} {043F}{0440}{043E}{0442}{043E}{043D} {041D}{0430}{043F}{043E}{043B}{0435}{043E}{043D} {0431}{0435}{044D}{044A}{0442}{0438}{0431}{043E}{0440}, {049A}{0420} {043A}{043E}{0434}, {0435}{0440} {0441}{0430}{0442}{04B3}{0438}, {0438}{043D}{0448}{043E}{043E}{0442}{043B}{0430}{0440}", "men ham sport internet son top mana film massa proton Napoleon bee{2019}tibor, QR kod, yer sathi, inshootlar"
     T False, "{00AB}Nun{00BB} surasi, {00AB}Hud{00BB} surasi. {00AB}Yusha{2019} ibn Nun tirik edi yoki Bani Isroil payg{2018}ambarlaridan Ilyos kabilar tirik edi{00BB}", "{00AB}{041D}{0443}{043D}{00BB} {0441}{0443}{0440}{0430}{0441}{0438}, {00AB}{04B2}{0443}{0434}{00BB} {0441}{0443}{0440}{0430}{0441}{0438}. {00AB}{042E}{0448}{0430}{044A} {0438}{0431}{043D} {041D}{0443}{043D} {0442}{0438}{0440}{0438}{043A} {044D}{0434}{0438} {0451}{043A}{0438} {0411}{0430}{043D}{0438} {0418}{0441}{0440}{043E}{0438}{043B} {043F}{0430}{0439}{0493}{0430}{043C}{0431}{0430}{0440}{043B}{0430}{0440}{0438}{0434}{0430}{043D} {0418}{043B}{0451}{0441} {043A}{0430}{0431}{0438}{043B}{0430}{0440} {0442}{0438}{0440}{0438}{043A} {044D}{0434}{0438}{00BB}"
     T True, "{00AB}{041D}{0443}{043D}{00BB} {0441}{0443}{0440}{0430}{0441}{0438}, {00AB}{04B2}{0443}{0434}{00BB} {0441}{0443}{0440}{0430}{0441}{0438}. {00AB}{042E}{0448}{0430}{044A} {0438}{0431}{043D} {041D}{0443}{043D} {0442}{0438}{0440}{0438}{043A} {044D}{0434}{0438} {0451}{043A}{0438} {0411}{0430}{043D}{0438} {0418}{0441}{0440}{043E}{0438}{043B} {043F}{0430}{0439}{0493}{0430}{043C}{0431}{0430}{0440}{043B}{0430}{0440}{0438}{0434}{0430}{043D} {0418}{043B}{0451}{0441} {043A}{0430}{0431}{0438}{043B}{0430}{0440} {0442}{0438}{0440}{0438}{043A} {044D}{0434}{0438}{00BB}", "{00AB}Nun{00BB} surasi, {00AB}Hud{00BB} surasi. {00AB}Yusha{2019} ibn Nun tirik edi yoki Bani Isroil payg{2018}ambarlaridan Ilyos kabilar tirik edi{00BB}"
     T False, "Yusha{2019} va shay{2019} {2018}Salom{2019} dedi", "{042E}{0448}{0430}{044A} {0432}{0430} {0448}{0430}{0439}{044A} {2018}{0421}{0430}{043B}{043E}{043C}{2019} {0434}{0435}{0434}{0438}"
     T True, "{042E}{0448}{0430}{044A} {0432}{0430} {0448}{0430}{0439}{044A} {2018}{0421}{0430}{043B}{043E}{043C}{2019} {0434}{0435}{0434}{0438}", "Yusha{2019} va shay{2019} {2018}Salom{2019} dedi"
+    T False, "Visa, Mastercard va American Express kartalari; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines va Uzbekistan Airways; Kun.uz saytida", "Visa, Mastercard {0432}{0430} American Express {043A}{0430}{0440}{0442}{0430}{043B}{0430}{0440}{0438}; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines {0432}{0430} Uzbekistan Airways; Kun.uz {0441}{0430}{0439}{0442}{0438}{0434}{0430}"
+    T True, "Visa, Mastercard {0432}{0430} American Express {043A}{0430}{0440}{0442}{0430}{043B}{0430}{0440}{0438}; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines {0432}{0430} Uzbekistan Airways; Kun.uz {0441}{0430}{0439}{0442}{0438}{0434}{0430}", "Visa, Mastercard va American Express kartalari; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines va Uzbekistan Airways; Kun.uz saytida"
+    T False, "Humo qushi, Mars sayyorasi, uzum, ravon, Astana shahri, Rio shahri, kun bo{2018}yi, BMW va GAZ ta{2019}minoti", "{04B2}{0443}{043C}{043E} {049B}{0443}{0448}{0438}, {041C}{0430}{0440}{0441} {0441}{0430}{0439}{0451}{0440}{0430}{0441}{0438}, {0443}{0437}{0443}{043C}, {0440}{0430}{0432}{043E}{043D}, {0410}{0441}{0442}{0430}{043D}{0430} {0448}{0430}{04B3}{0440}{0438}, {0420}{0438}{043E} {0448}{0430}{04B3}{0440}{0438}, {043A}{0443}{043D} {0431}{045E}{0439}{0438}, BMW {0432}{0430} {0413}{0410}{0417} {0442}{0430}{044A}{043C}{0438}{043D}{043E}{0442}{0438}"
+    T True, "{04B2}{0443}{043C}{043E} {049B}{0443}{0448}{0438}, {041C}{0430}{0440}{0441} {0441}{0430}{0439}{0451}{0440}{0430}{0441}{0438}, {0443}{0437}{0443}{043C}, {0440}{0430}{0432}{043E}{043D}, {0410}{0441}{0442}{0430}{043D}{0430} {0448}{0430}{04B3}{0440}{0438}, {0420}{0438}{043E} {0448}{0430}{04B3}{0440}{0438}, {043A}{0443}{043D} {0431}{045E}{0439}{0438}, BMW {0432}{0430} {0413}{0410}{0417} {0442}{0430}{044A}{043C}{0438}{043D}{043E}{0442}{0438}", "Humo qushi, Mars sayyorasi, uzum, ravon, Astana shahri, Rio shahri, kun bo{2018}yi, BMW va GAZ ta{2019}minoti"
+    T False, "M. Yusuf, L. Tolstoy, I. Karimov; XX asr, V asr, I jild; ip va igna, IP manzil, teleekranda", "{041C}. {042E}{0441}{0443}{0444}, {041B}. {0422}{043E}{043B}{0441}{0442}{043E}{0439}, {0418}. {041A}{0430}{0440}{0438}{043C}{043E}{0432}; XX {0430}{0441}{0440}, V {0430}{0441}{0440}, I {0436}{0438}{043B}{0434}; {0438}{043F} {0432}{0430} {0438}{0433}{043D}{0430}, IP {043C}{0430}{043D}{0437}{0438}{043B}, {0442}{0435}{043B}{0435}{044D}{043A}{0440}{0430}{043D}{0434}{0430}"
+    T True, "{041C}. {042E}{0441}{0443}{0444}, {041B}. {0422}{043E}{043B}{0441}{0442}{043E}{0439}, {0418}. {041A}{0430}{0440}{0438}{043C}{043E}{0432}; XX {0430}{0441}{0440}, V {0430}{0441}{0440}, I {0436}{0438}{043B}{0434}; {0438}{043F} {0432}{0430} {0438}{0433}{043D}{0430}, IP {043C}{0430}{043D}{0437}{0438}{043B}, {0442}{0435}{043B}{0435}{044D}{043A}{0440}{0430}{043D}{0434}{0430}", "M. Yusuf, L. Tolstoy, I. Karimov; XX asr, V asr, I jild; ip va igna, IP manzil, teleekranda"
     T False, "abzas", "{0430}{0431}{0437}{0430}{0446}"
     T True, "{0430}{0431}{0437}{0430}{0446}", "abzas"
     T False, "aeromobil", "{0430}{044D}{0440}{043E}{043C}{043E}{0431}{0438}{043B}{044C}"
@@ -3426,15 +3574,15 @@ Private Sub UzTests1()
     T True, "{043A}{043E}{043D}{0444}{0435}{0440}{0435}{043D}{0446}{0438}{044F}{043D}{0438}{043D}{0433}", "konferensiyaning"
     T False, "konferensiyasiga", "{043A}{043E}{043D}{0444}{0435}{0440}{0435}{043D}{0446}{0438}{044F}{0441}{0438}{0433}{0430}"
     T True, "{043A}{043E}{043D}{0444}{0435}{0440}{0435}{043D}{0446}{0438}{044F}{0441}{0438}{0433}{0430}", "konferensiyasiga"
+End Sub
+
+Private Sub UzTests2()
     T False, "konkida", "{043A}{043E}{043D}{044C}{043A}{0438}{0434}{0430}"
     T True, "{043A}{043E}{043D}{044C}{043A}{0438}{0434}{0430}", "konkida"
     T False, "konsepsiyada", "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0434}{0430}"
     T True, "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0434}{0430}", "konsepsiyada"
     T False, "konsepsiyasi", "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0441}{0438}"
     T True, "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0441}{0438}", "konsepsiyasi"
-End Sub
-
-Private Sub UzTests2()
     T False, "konsepsiyasining", "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0441}{0438}{043D}{0438}{043D}{0433}"
     T True, "{043A}{043E}{043D}{0446}{0435}{043F}{0446}{0438}{044F}{0441}{0438}{043D}{0438}{043D}{0433}", "konsepsiyasining"
     T False, "konserniga", "{043A}{043E}{043D}{0446}{0435}{0440}{043D}{0438}{0433}{0430}"
@@ -3729,15 +3877,15 @@ Private Sub UzTests2()
     T True, "{0442}{043E}{043B}", "tol"
     T False, "trifol", "{0442}{0440}{0438}{0444}{043E}{043B}{044C}"
     T True, "{0442}{0440}{0438}{0444}{043E}{043B}{044C}", "trifol"
+End Sub
+
+Private Sub UzTests3()
     T False, "tunnel", "{0442}{0443}{043D}{043D}{0435}{043B}"
     T True, "{0442}{0443}{043D}{043D}{0435}{043B}", "tunnel"
     T False, "tyulen", "{0442}{044E}{043B}{0435}{043D}{044C}"
     T True, "{0442}{044E}{043B}{0435}{043D}{044C}", "tulen"
     T False, "ultimatum", "{0443}{043B}{044C}{0442}{0438}{043C}{0430}{0442}{0443}{043C}"
     T True, "{0443}{043B}{044C}{0442}{0438}{043C}{0430}{0442}{0443}{043C}", "ultimatum"
-End Sub
-
-Private Sub UzTests3()
     T False, "ultraqisqa", "{0443}{043B}{044C}{0442}{0440}{0430}{049B}{0438}{0441}{049B}{0430}"
     T True, "{0443}{043B}{044C}{0442}{0440}{0430}{049B}{0438}{0441}{049B}{0430}", "ultraqisqa"
     T False, "unsiya", "{0443}{043D}{0446}{0438}{044F}"
@@ -4032,15 +4180,15 @@ Private Sub UzTests3()
     T False, "Gipotsikloidalardan", "{0413}{0438}{043F}{043E}{0446}{0438}{043A}{043B}{043E}{0438}{0434}{0430}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "glitsinlardan", "{0433}{043B}{0438}{0446}{0438}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Glitsinlardan", "{0413}{043B}{0438}{0446}{0438}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
+End Sub
+
+Private Sub UzTests4()
     T False, "glyatsiologlardan", "{0433}{043B}{044F}{0446}{0438}{043E}{043B}{043E}{0433}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Glyatsiologlardan", "{0413}{043B}{044F}{0446}{0438}{043E}{043B}{043E}{0433}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "goldenitlardan", "{0433}{043E}{043B}{044C}{0434}{0435}{043D}{0438}{0442}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Goldenitlardan", "{0413}{043E}{043B}{044C}{0434}{0435}{043D}{0438}{0442}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "golotsenlardan", "{0433}{043E}{043B}{043E}{0446}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Golotsenlardan", "{0413}{043E}{043B}{043E}{0446}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
-End Sub
-
-Private Sub UzTests4()
     T False, "gomoyotermlardan", "{0433}{043E}{043C}{043E}{0439}{043E}{0442}{0435}{0440}{043C}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Gomoyotermlardan", "{0413}{043E}{043C}{043E}{0439}{043E}{0442}{0435}{0440}{043C}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "gramitsidinlardan", "{0433}{0440}{0430}{043C}{0438}{0446}{0438}{0434}{0438}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
@@ -4335,15 +4483,15 @@ Private Sub UzTests4()
     T False, "Trixotsefalyozlardan", "{0422}{0440}{0438}{0445}{043E}{0446}{0435}{0444}{0430}{043B}{0451}{0437}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "tsikllardan", "{0446}{0438}{043A}{043B}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Tsikllardan", "{0426}{0438}{043A}{043B}{043B}{0430}{0440}{0434}{0430}{043D}"
+End Sub
+
+Private Sub UzTests5()
     T False, "tsizmlardan", "{0446}{0438}{0437}{043C}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Tsizmlardan", "{0426}{0438}{0437}{043C}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "ustritsalardan", "{0443}{0441}{0442}{0440}{0438}{0446}{0430}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Ustritsalardan", "{0423}{0441}{0442}{0440}{0438}{0446}{0430}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "vaksinolardan", "{0432}{0430}{043A}{0446}{0438}{043D}{043E}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Vaksinolardan", "{0412}{0430}{043A}{0446}{0438}{043D}{043E}{043B}{0430}{0440}{0434}{0430}{043D}"
-End Sub
-
-Private Sub UzTests5()
     T False, "valsovkalardan", "{0432}{0430}{043B}{044C}{0446}{043E}{0432}{043A}{0430}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Valsovkalardan", "{0412}{0430}{043B}{044C}{0446}{043E}{0432}{043A}{0430}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "valvullardan", "{0432}{0430}{043B}{044C}{0432}{0443}{043B}{043B}{0430}{0440}{0434}{0430}{043D}"

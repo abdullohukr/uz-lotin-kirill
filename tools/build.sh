@@ -9,6 +9,7 @@ ORIGIN="$(echo "$BASE" | sed -E 's#^(https?://[^/]+).*#\1#')"
 
 rm -rf dist && mkdir -p dist/assets
 python3 tools/make_icons.py >/dev/null
+python3 tools/build_brands.py >/dev/null
 cp addin/*.html addin/*.js addin/*.css dist/
 cp addin/assets/*.png dist/assets/
 cp src/engine.js dist/engine.js
@@ -17,6 +18,7 @@ import json
 ex = json.load(open("data/exceptions.json"))
 ex["foreign"] = json.load(open("data/foreign.json"))
 ex["acronyms"] = json.load(open("data/acronyms.json"))
+ex["brands"] = json.load(open("data/brands.json"))
 open("dist/exceptions.js", "w").write("window.UZ_EXCEPTIONS = " + json.dumps(ex, ensure_ascii=False, separators=(",", ":")) + ";\n")
 PY
 # cache busting: the pages load their scripts with ?v=<version from version.json>

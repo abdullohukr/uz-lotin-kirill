@@ -52,10 +52,17 @@ eq("brands in quotes", t.toCyrillic("bozorda «Smarts Vey», «Gold Kvest» va �
 eq("cadenza", t.toCyrillic("«CADENZAX MUSIC» platformasi, «CadenzaX music» nomli"), "«CADENZAX MUSIC» платформаси, «CadenzaX music» номли");
 eq("vip", t.toCyrillic("maxsus «VIP» darajalarni, VIP xizmat"), "махсус «VIP» даражаларни, VIP хизмат");
 eq("apple youtube", t.toCyrillic("platformalarida (Apple Music, YouTube va h.k.) eshitilganda"), "платформаларида (Apple Music, YouTube ва ҳ.к.) эшитилганда");
-eq("english spelling", t.toCyrillic("Google, Facebook, iPhone, Telegram, online"), "Google, Facebook, iPhone, Телеграм, online");
+eq("english spelling", t.toCyrillic("Google, Facebook, iPhone, Telegram, online"), "Google, Facebook, iPhone, Telegram, online");
 eq("uzbek words that are english too", t.toCyrillic("men ham sport internet son top mana film massa proton Napoleon"), "мен ҳам спорт интернет сон топ мана фильм масса протон Наполеон");
 eq("uzbek quote stays converted", t.toCyrillic("«Sahihi Buxoriy» va «Ixlos» surasi"), "«Саҳиҳи Бухорий» ва «Ихлос» сураси");
 eq("surah names and quotations", t.toCyrillic("«Nun» surasi, «Hud» surasi. «Yusha’ ibn Nun tirik edi yoki Bani Isroil payg‘ambarlaridan Ilyos kabilar tirik edi»"), "«Нун» сураси, «Ҳуд» сураси. «Юшаъ ибн Нун тирик эди ёки Бани Исроил пайғамбарларидан Илёс кабилар тирик эди»");
+eq("brands", t.toCyrillic("Visa, Mastercard va American Express kartalari; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines va Uzbekistan Airways; Kun.uz saytida"),
+  "Visa, Mastercard ва American Express карталари; Toyota Camry, Chevrolet Malibu, Kia Rio; Turkish Airlines ва Uzbekistan Airways; Kun.uz сайтида");
+eq("uzbek words named like brands", t.toCyrillic("Humo qushi, Mars sayyorasi, uzum, ravon, Astana shahri, Rio shahri, kun bo‘yi, BMW va GAZ ta’minoti"),
+  "Ҳумо қуши, Марс сайёраси, узум, равон, Астана шаҳри, Рио шаҳри, кун бўйи, BMW ва ГАЗ таъминоти");
+eq("initials and roman", t.toCyrillic("M. Yusuf, L. Tolstoy, I. Karimov; XX asr, V asr, I jild"), "М. Юсуф, Л. Толстой, И. Каримов; XX аср, V аср, I жилд");
+eq("ip is a word", t.toCyrillic("ip va igna, IP manzil, teleekranda"), "ип ва игна, IP манзил, телеэкранда");
+eq("accented names", t.toCyrillic("Ülker va Müller, Citroën"), "Ülker ва Müller, Citroën");
 eq("bee'tibor", t.toCyrillic("bee’tibor, QR kod"), "беэътибор, ҚР код");
 eq("sath inshoot", t.toCyrillic("yer sathi, inshootlar, Movarounnahr"), "ер сатҳи, иншоотлар, Мовароуннаҳр");
 eq("urls stay", t.toCyrillic("Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"), "Линк: https://islamqa.info/ar/answers/332928 ва www.savodxon.uz, ism.familiya@example.com ёзинг");

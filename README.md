@@ -44,7 +44,17 @@
   * короткие (до 4 слов) названия в кавычках с иностранным словом: «Gold Kvest», «Seven Daymond»,
     «CadenzaX music», «VIP». Длинные цитаты и одиночные слова в кавычках («Nun», «Hud») переводятся;
   * названия из заглавных слов рядом с явно иностранным словом: Apple Music;
-  * всегда латиницей: VIP, SMS, PDF, USB, online… (`data/acronyms.json`).
+  * всегда латиницей: VIP, SMS, PDF, USB, online… (`data/acronyms.json`; короткие — только заглавными);
+  * **бренды** (`data/brands.txt`, ≈1600 названий): платёжные системы и банки (Visa, Mastercard,
+    American Express, PayPal), авиакомпании (Turkish Airlines, Emirates, Uzbekistan Airways), марки и
+    модели машин (Toyota Camry, Chevrolet Malibu, BYD), техника и приложения (Samsung, Telegram,
+    TikTok), одежда, косметика, еда, отели, СМИ. Название сохраняется, только если написано
+    с заглавной буквы. В список не входят слова, у которых есть узбекское значение (Humo, Uzum,
+    Ravon, Mars, Astana, Rio, Panda, Kakao…) и бренды русского происхождения (Lada, Yandex, Gazprom) —
+    они переводятся как обычно: *Humo qushi → Ҳумо қуши*, *Mars sayyorasi → Марс сайёраси*.
+    Список можно дополнять: одна строка — одно название, затем `python3 tools/build_brands.py`;
+  * слова с буквами ü, é, ö… (Ülker, Müller, Citroën) остаются латиницей целиком.
+* Одна буква с точкой — это инициал (M. Yusuf → М. Юсуф), без точки — римская цифра (V asr).
   Английский список (`data/foreign.json`) — частотный список FrequencyWords (MIT), из которого убраны
   слова, которые узбекские кириллические тексты пишут кириллицей (спорт, интернет, ҳам, мен).
 

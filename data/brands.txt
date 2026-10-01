@@ -1,0 +1,1709 @@
+# Brand and product names that stay in Latin when Uzbek text is converted to Cyrillic.
+# One name per line; several words = a phrase (all words must follow each other).
+# A name is kept only when written with a capital letter (Visa, VISA - not "visa").
+# Words that are also ordinary Uzbek words, places or animals (Uzum, Humo, Mars,
+# Ural, Puma...) are left out on purpose or only listed as full phrases.
+# Lines starting with # are comments.
+
+## Payment systems, cards, banks, money transfer
+Visa
+Visa Electron
+Mastercard
+MasterCard
+American Express
+Amex
+UnionPay
+China UnionPay
+JCB
+Diners Club
+Discover
+PayPal
+Payoneer
+Stripe
+Skrill
+Neteller
+Wise
+TransferWise
+Revolut
+Western Union
+MoneyGram
+Ria Money Transfer
+Contact
+Swift
+SWIFT
+Apple Pay
+Google Pay
+Samsung Pay
+Alipay
+WeChat Pay
+Venmo
+Zelle
+Klarna
+Payme
+Click
+Paynet
+Uzcard
+UzCard
+TBC Bank
+Tenge Bank
+Ziraat Bank
+Raiffeisen
+Raiffeisenbank
+Citibank
+Citi
+HSBC
+Barclays
+JPMorgan
+J.P. Morgan
+Chase
+Goldman Sachs
+Morgan Stanley
+Deutsche Bank
+Commerzbank
+BNP Paribas
+Credit Suisse
+UBS
+ING
+Wells Fargo
+Bank of America
+Standard Chartered
+Lloyds
+NatWest
+Emirates NBD
+Al Rajhi
+Kaspi
+Kaspi Bank
+Halyk Bank
+Bitcoin
+Ethereum
+Binance
+Coinbase
+Tether
+USDT
+Litecoin
+Dogecoin
+Ripple
+Toncoin
+Bybit
+OKX
+KuCoin
+Forex
+NASDAQ
+Nasdaq
+NYSE
+Dow Jones
+Bloomberg
+Reuters
+Moody's
+Fitch
+Visa Inc
+Mastercard Inc
+
+## Airlines and airports
+Uzbekistan Airways
+Air Astana
+FlyArystan
+Emirates
+Etihad
+Etihad Airways
+Qatar Airways
+Turkish Airlines
+Pegasus
+AJet
+Lufthansa
+Air France
+KLM
+British Airways
+Alitalia
+ITA Airways
+Swiss
+Austrian Airlines
+Ryanair
+easyJet
+Wizz Air
+Wizz
+American Airlines
+Delta Air Lines
+United Airlines
+Southwest
+JetBlue
+Air Canada
+Qantas
+Singapore Airlines
+Cathay Pacific
+Korean Air
+Asiana
+Japan Airlines
+China Southern
+China Eastern
+Air China
+Hainan Airlines
+Air India
+IndiGo
+Saudia
+Flynas
+Flyadeal
+Flydubai
+FlyDubai
+Air Arabia
+Gulf Air
+Oman Air
+SalamAir
+Kuwait Airways
+Royal Jordanian
+EgyptAir
+Ethiopian Airlines
+Kenya Airlines
+Azerbaijan Airlines
+Somon Air
+Air Manas
+Avia Traffic
+Centrum Air
+Silk Avia
+Boeing
+Airbus
+Embraer
+Bombardier
+
+## Cars: makes
+Toyota
+Lexus
+Honda
+Acura
+Nissan
+Infiniti
+Mazda
+Subaru
+Mitsubishi
+Suzuki
+Isuzu
+Daihatsu
+Hyundai
+Kia
+Genesis
+SsangYong
+Daewoo
+Chevrolet
+Chevy
+Cadillac
+Buick
+GMC
+Ford
+Lincoln
+Dodge
+Jeep
+Chrysler
+Tesla
+Rivian
+Lucid
+Volkswagen
+VW
+Audi
+Porsche
+BMW
+Mercedes
+Mercedes-Benz
+Benz
+Maybach
+Opel
+Skoda
+Seat
+Cupra
+Renault
+Peugeot
+Citroen
+Citroën
+Dacia
+Fiat
+Alfa Romeo
+Lancia
+Ferrari
+Lamborghini
+Maserati
+Bugatti
+Bentley
+Rolls-Royce
+Aston Martin
+Jaguar Land Rover
+Land Rover
+Range Rover
+McLaren
+Lotus
+Volvo
+Polestar
+Saab
+BYD
+Geely
+Chery
+Haval
+Great Wall
+Changan
+JAC
+Jetour
+Exeed
+Omoda
+Jaecoo
+Hongqi
+Lifan
+Dongfeng
+FAW
+GAC
+Zeekr
+Li Auto
+Nio
+NIO
+Xpeng
+XPeng
+Leapmotor
+Voyah
+Kaiyi
+Scania
+Iveco
+DAF
+Hino
+Shacman
+Howo
+Sinotruk
+Yutong
+Higer
+Golden Dragon
+Otokar
+Caterpillar
+Komatsu
+John Deere
+Harley-Davidson
+Yamaha
+Kawasaki
+Ducati
+KTM
+Vespa
+
+## Cars: models (popular in Uzbekistan and worldwide)
+Nexia
+Matiz
+Spark
+Cobalt
+Lacetti
+Gentra
+Malibu
+Captiva
+Tracker
+Equinox
+Trailblazer
+Traverse
+Tahoe
+Onix
+Monza
+Damas
+Labo
+Epica
+Camaro
+Corvette
+Cruze
+Aveo
+Camry
+Corolla
+Prius
+Land Cruiser
+Prado
+RAV4
+Highlander
+Hilux
+Yaris
+Elantra
+Tucson
+Santa Fe
+Creta
+Accent
+Solaris
+Palisade
+Sportage
+Sorento
+Cerato
+Carnival
+Seltos
+Mustang
+Focus
+Fiesta
+Mondeo
+Explorer
+Ranger
+Tiguan
+Touareg
+Jetta
+Octavia
+Superb
+Kodiaq
+Duster
+Sandero
+Megane
+Qashqai
+X-Trail
+Altima
+Civic
+Accord
+CR-V
+Outlander
+Pajero
+Lancer
+Forester
+Outback
+Impreza
+Model S
+Model X
+Model Y
+Cybertruck
+Tiggo
+Arrizo
+Coolray
+Monjaro
+Atlas Pro
+Song Plus
+Han EV
+
+## Technology companies and products
+Apple
+iPhone
+iPad
+iPod
+iMac
+MacBook
+MacBook Air
+MacBook Pro
+Mac mini
+AirPods
+Apple Watch
+Apple TV
+iOS
+iPadOS
+macOS
+watchOS
+iCloud
+iTunes
+App Store
+FaceTime
+Google
+Gmail
+Google Maps
+Google Drive
+Google Docs
+Google Translate
+Google Play
+Play Market
+Android
+Chrome
+Chromebook
+Pixel
+YouTube
+YouTube Music
+Alphabet
+Microsoft
+Windows
+Office
+Word
+Excel
+PowerPoint
+Outlook
+OneDrive
+OneNote
+Teams
+Skype
+Xbox
+Bing
+Azure
+Copilot
+LinkedIn
+GitHub
+Samsung
+Galaxy
+Huawei
+Honor
+Xiaomi
+Redmi
+Poco
+POCO
+Oppo
+OPPO
+Vivo
+vivo
+Realme
+realme
+OnePlus
+Nokia
+Motorola
+Sony
+PlayStation
+Panasonic
+Toshiba
+Hitachi
+Sharp
+Canon
+Nikon
+Fujifilm
+Olympus
+Casio
+Seiko
+Citizen
+LG
+Philips
+Siemens
+Bosch
+Dyson
+Electrolux
+Whirlpool
+Beko
+Arcelik
+Vestel
+Indesit
+Hotpoint
+Gorenje
+Miele
+Haier
+Midea
+Gree
+Hisense
+TCL
+Lenovo
+ThinkPad
+Dell
+HP
+Hewlett-Packard
+Asus
+ASUS
+Acer
+MSI
+Razer
+Logitech
+Intel
+AMD
+Nvidia
+NVIDIA
+GeForce
+Qualcomm
+Snapdragon
+MediaTek
+ARM
+IBM
+Oracle
+Cisco
+SAP
+Salesforce
+Adobe
+Photoshop
+Illustrator
+InDesign
+Acrobat
+Premiere Pro
+After Effects
+Lightroom
+Figma
+Canva
+Autodesk
+AutoCAD
+Unity
+Unreal Engine
+Linux
+Ubuntu
+Debian
+Red Hat
+Mozilla
+Firefox
+Avast
+ESET
+Norton
+McAfee
+Dropbox
+Zoom
+Slack
+Notion
+Trello
+Jira
+Atlassian
+Evernote
+Spotify
+Shazam
+SoundCloud
+Netflix
+Disney
+Disney+
+HBO
+Hulu
+Prime Video
+Amazon Prime
+Twitch
+Steam
+Epic Games
+Valve
+Nintendo
+Switch
+Ubisoft
+Activision
+Blizzard
+EA
+Electronic Arts
+Rockstar
+PUBG
+Fortnite
+Minecraft
+Roblox
+Counter-Strike
+Dota
+Dota 2
+Call of Duty
+GTA
+Tesla Motors
+SpaceX
+Starlink
+OpenAI
+ChatGPT
+GPT
+Claude
+Anthropic
+Gemini
+DeepSeek
+Midjourney
+Perplexity
+Grok
+xAI
+Meta
+Facebook
+Instagram
+WhatsApp
+Messenger
+Threads
+Telegram
+Viber
+WeChat
+KakaoTalk
+TikTok
+Douyin
+ByteDance
+Snapchat
+Pinterest
+Reddit
+Tumblr
+Quora
+Twitter
+Discord
+Clubhouse
+Likee
+Kwai
+Tinder
+Bumble
+Wikipedia
+Amazon
+eBay
+AliExpress
+Alibaba
+Taobao
+Temu
+Shein
+SHEIN
+Wildberries
+Uzum Market
+Uzum Bank
+Uzum Nasiya
+OLX
+Avito
+Etsy
+Shopify
+Booking
+Booking.com
+Airbnb
+Expedia
+Tripadvisor
+Skyscanner
+Aviasales
+Uber
+Lyft
+MyTaxi
+Glovo
+Wolt
+Express24
+Deliveroo
+DoorDash
+Grab
+Gojek
+Duolingo
+Coursera
+Udemy
+edX
+Khan Academy
+Quizlet
+Kahoot
+Grammarly
+Speedtest
+Ookla
+Truecaller
+Google Meet
+Gmail
+Hotmail
+Yahoo
+Opera Mini
+UC Browser
+Beeline
+Ucell
+Mobiuz
+Uzmobile
+Humans
+Perfectum
+Vodafone
+Orange
+Verizon
+AT&T
+T-Mobile
+Kcell
+Turkcell
+
+## Clothing, shoes, sport, cosmetics, luxury
+Nike
+Adidas
+Reebok
+Under Armour
+New Balance
+Asics
+ASICS
+Fila
+FILA
+Kappa
+Umbro
+Columbia
+The North Face
+North Face
+Timberland
+Converse
+Vans
+Skechers
+Salomon
+Crocs
+Lacoste
+Levi's
+Wrangler
+Lee Cooper
+Calvin Klein
+Tommy Hilfiger
+Ralph Lauren
+Polo Ralph Lauren
+Hugo Boss
+Armani
+Giorgio Armani
+Emporio Armani
+Gucci
+Prada
+Louis Vuitton
+Chanel
+Dior
+Christian Dior
+Hermes
+Hermès
+Versace
+Dolce & Gabbana
+Givenchy
+Balenciaga
+Burberry
+Fendi
+Valentino
+Yves Saint Laurent
+Saint Laurent
+Cartier
+Rolex
+Tissot
+Swatch
+Longines
+Patek Philippe
+Audemars Piguet
+Breitling
+Tag Heuer
+TAG Heuer
+Montblanc
+Ray-Ban
+Bershka
+Pull&Bear
+Stradivarius
+Massimo Dutti
+H&M
+Uniqlo
+Primark
+LC Waikiki
+Koton
+DeFacto
+Mavi
+Colin's
+Ikea
+IKEA
+L'Oreal
+L'Oréal
+Maybelline
+Garnier
+Nivea
+Dove
+Rexona
+Axe
+Gillette
+Colgate
+Oral-B
+Head & Shoulders
+Pantene
+Schwarzkopf
+Avon
+Oriflame
+Estee Lauder
+Estée Lauder
+Clinique
+Lancome
+Lancôme
+MAC
+Sephora
+The Body Shop
+Bioderma
+Vichy
+La Roche-Posay
+Johnson & Johnson
+Procter & Gamble
+P&G
+Unilever
+Henkel
+Tide
+Persil
+Fairy
+Domestos
+Vanish
+Pampers
+Huggies
+
+## Food, drinks, restaurants, hotels, retail
+Coca-Cola
+Coca Cola
+Coke
+Pepsi
+PepsiCo
+Fanta
+Sprite
+Mirinda
+Schweppes
+Dr Pepper
+Red Bull
+Monster
+Burn
+Lipton
+Nescafe
+Nescafé
+Nestle
+Nestlé
+Jacobs
+Lavazza
+Starbucks
+Costa Coffee
+Tim Hortons
+Dunkin
+Dunkin'
+Danone
+Activia
+Actimel
+Ferrero
+Nutella
+Kinder
+Raffaello
+Milka
+Toblerone
+Snickers
+Twix
+Bounty
+Mars Inc
+KitKat
+Kit Kat
+Oreo
+Lay's
+Pringles
+Cheetos
+Doritos
+Heinz
+Knorr
+Maggi
+Hellmann's
+Barilla
+Kellogg's
+Nesquik
+Alpen Gold
+Orbit
+Dirol
+Mentos
+Chupa Chups
+Haribo
+Lindt
+Ritter Sport
+Heineken
+Carlsberg
+Tuborg
+McDonald's
+KFC
+Burger King
+Subway
+Pizza Hut
+Domino's
+Papa John's
+Wendy's
+Taco Bell
+Popeyes
+Chick-fil-A
+Shake Shack
+Five Guys
+Hardee's
+Evos
+EVOS
+Bellissimo
+Feed Up
+Les Ailes
+Hilton
+Marriott
+Sheraton
+Hyatt
+Radisson
+Radisson Blu
+Ritz-Carlton
+Four Seasons
+InterContinental
+Holiday Inn
+Novotel
+Ibis
+Accor
+Wyndham
+Ramada
+Best Western
+Mercure
+Rixos
+Hilton Garden Inn
+Walmart
+Costco
+Carrefour
+Tesco
+Auchan
+Lidl
+SPAR
+Mediapark
+Texnomart
+Samsung Electronics
+
+## Media, news, sport organisations
+BBC
+BBC News
+CNN
+Al Jazeera
+Sky News
+Euronews
+Fox News
+CNBC
+NBC
+ABC News
+Associated Press
+AP
+AFP
+Forbes
+Fortune
+The Economist
+Financial Times
+The Guardian
+The New York Times
+New York Times
+The Washington Post
+Washington Post
+The Times
+Daily Mail
+National Geographic
+Discovery
+Discovery Channel
+Animal Planet
+Eurosport
+ESPN
+Kun.uz
+Daryo.uz
+Gazeta.uz
+Podrobno.uz
+UzA
+Uza.uz
+Euronews Uzbek
+
+## Other world brands and companies
+Amazon Web Services
+AWS
+Tesla Inc
+Walt Disney
+Warner Bros
+Pixar
+Marvel
+DC Comics
+Lego
+LEGO
+Mattel
+Barbie
+Hasbro
+Pokemon
+Pokémon
+Hello Kitty
+Xerox
+Kodak
+Polaroid
+Shell
+BP
+ExxonMobil
+Chevron
+TotalEnergies
+Saudi Aramco
+Aramco
+Petronas
+Siemens Energy
+General Electric
+Honeywell
+Pfizer
+Moderna
+AstraZeneca
+Johnson&Johnson
+Novartis
+Roche
+Sanofi
+Bayer
+GSK
+Teva
+Abbott
+Medtronic
+FedEx
+DHL
+UPS
+Maersk
+TNT
+Emirates SkyCargo
+Visa Card
+Master Card
+
+
+## Cars: more makes and models
+Alpina
+Abarth
+Optima
+Picanto
+Stinger
+Telluride
+Mohave
+Ioniq
+IONIQ
+Kona
+Staria
+Starex
+Getz
+Avalon
+Fortuner
+Sequoia
+Tacoma
+Sienna
+Venza
+Alphard
+Vellfire
+Teana
+Juke
+Murano
+Pathfinder
+Navara
+Tiida
+Almera
+Galant
+Montero
+Teramont
+Touran
+Caddy
+Amarok
+Arteon
+Vito
+Actros
+Quattro
+Cayenne
+Macan
+Panamera
+Taycan
+Defender
+Evoque
+Velar
+Silverado
+Suburban
+Blazer
+Atto
+Emgrand
+Tugella
+Jolion
+Dargo
+Escalade
+Wrangler
+Grand Cherokee
+Cherokee
+Compass
+Charger
+Challenger
+Durango
+Bronco
+Mondeo
+Kuga
+Escape
+Edge
+Expedition
+Maverick
+Fusion
+Countryman
+Insignia
+Corsa
+Zafira
+Mokka
+Clio
+Arkana
+Kaptur
+Koleos
+Fluence
+Berlingo
+Ducato
+Doblo
+Tipo
+Punto
+Giulia
+Stelvio
+Huracan
+Aventador
+Urus
+Cullinan
+Phantom
+Ghost
+Bentayga
+Continental GT
+Vantage
+DBX
+XC90
+XC60
+XC40
+
+## Phones, gadgets, electronics
+Kindle
+Alexa
+Echo Dot
+Fire TV
+Roku
+GoPro
+DJI
+Garmin
+Fitbit
+Mi Band
+Huawei Mate
+Honor Magic
+Infinix
+Tecno
+TECNO
+Itel
+itel
+Blackview
+Ulefone
+Doogee
+ZTE
+Alcatel
+BlackBerry
+HTC
+Meizu
+Zenfone
+ROG
+Galaxy Note
+Galaxy Tab
+Galaxy Watch
+Galaxy Buds
+Surface
+Oculus
+Vision Pro
+AirTag
+HomePod
+iMessage
+Keynote
+GarageBand
+Final Cut Pro
+Xcode
+JBL
+Bose
+Sennheiser
+Beats
+Harman Kardon
+Bang & Olufsen
+Xbox Series
+PlayStation 5
+Nintendo Switch
+Tefal
+Moulinex
+Rowenta
+Kenwood
+Delonghi
+DeLonghi
+Krups
+Nespresso
+Scarlett
+Vitek
+Shivaki
+Hofmann
+Indesit
+Candy
+Smeg
+Liebherr
+Daikin
+Carrier
+Toshiba
+Epson
+Brother
+Kyocera
+Ricoh
+Konica Minolta
+Seagate
+Western Digital
+SanDisk
+Transcend
+Corsair
+HyperX
+Tp-Link
+TP-Link
+D-Link
+Netgear
+Huawei Cloud
+MikroTik
+Ubiquiti
+
+## Software, programming, cloud
+JavaScript
+TypeScript
+Python
+Kotlin
+Golang
+PHP
+Node.js
+NodeJS
+React
+Angular
+Vue.js
+Django
+Flask
+Laravel
+Symfony
+Spring Boot
+WordPress
+Joomla
+Drupal
+Wix
+Bitrix
+Magento
+MySQL
+PostgreSQL
+MongoDB
+Redis
+SQLite
+Docker
+Kubernetes
+Git
+GitLab
+Bitbucket
+Jenkins
+Postman
+Visual Studio
+VS Code
+IntelliJ
+IntelliJ IDEA
+PyCharm
+WebStorm
+Android Studio
+Google Cloud
+Cloudflare
+DigitalOcean
+Heroku
+Vercel
+Netlify
+Firebase
+Supabase
+Hetzner
+OVH
+GoDaddy
+Namecheap
+Tableau
+Power BI
+Jupyter
+TensorFlow
+PyTorch
+Hugging Face
+Stack Overflow
+StackOverflow
+LeetCode
+Codeforces
+Kaggle
+Replit
+Moodle
+Google Classroom
+Webex
+Botim
+TamTam
+Mail.ru
+Rambler
+ProtonMail
+CapCut
+InShot
+VSCO
+Snapseed
+PicsArt
+Remini
+FaceApp
+Waze
+Yango
+inDrive
+inDriver
+Careem
+Talabat
+Trendyol
+Hepsiburada
+Lamoda
+Joom
+Lazada
+Shopee
+Flipkart
+Rakuten
+Zalando
+Farfetch
+Vinted
+Depop
+Pinduoduo
+JD.com
+Meituan
+Baidu
+Tencent
+Weibo
+Youku
+Bilibili
+Naver
+Line Pay
+
+## Games
+Clash of Clans
+Clash Royale
+Brawl Stars
+PUBG Mobile
+Free Fire
+Genshin Impact
+Among Us
+Candy Crush
+Subway Surfers
+Angry Birds
+Tetris
+Pac-Man
+Super Mario
+Zelda
+Pokemon Go
+League of Legends
+Valorant
+Overwatch
+World of Warcraft
+Warcraft
+StarCraft
+Diablo
+Hearthstone
+Apex Legends
+Battlefield
+Assassin's Creed
+Far Cry
+Need for Speed
+Mortal Kombat
+Tekken
+Street Fighter
+Hitman
+The Witcher
+Cyberpunk
+Elden Ring
+Dark Souls
+Skyrim
+Fallout
+Halo
+Gears of War
+Forza
+Gran Turismo
+The Sims
+SimCity
+Rocket League
+Fall Guys
+Standoff
+Standoff 2
+Mobile Legends
+Clash Mini
+Hamster Kombat
+Notcoin
+
+## More airlines
+Eurowings
+Condor
+TUI
+Jet2
+Norwegian
+SAS
+Finnair
+airBaltic
+LOT Polish Airlines
+TAP Air Portugal
+Aer Lingus
+Vueling
+Volotea
+Brussels Airlines
+Aegean
+Air Serbia
+Croatia Airlines
+Tarom
+Bulgaria Air
+Belavia
+Air Moldova
+Georgian Airways
+Buta Airways
+Iran Air
+Mahan Air
+Pakistan International Airlines
+PIA
+Biman
+SriLankan Airlines
+Thai Airways
+Vietnam Airlines
+Malaysia Airlines
+AirAsia
+Garuda Indonesia
+Philippine Airlines
+Cebu Pacific
+EVA Air
+China Airlines
+Starlux
+Air Busan
+Jeju Air
+Air New Zealand
+Virgin Atlantic
+Virgin Australia
+Virgin
+Jetstar
+LATAM
+Avianca
+Copa Airlines
+Aeromexico
+Air Europa
+Royal Air Maroc
+Tunisair
+Air Algerie
+Kenya Airways
+RwandAir
+South African Airways
+Middle East Airlines
+Jazeera Airways
+Nile Air
+Air Cairo
+Fly Baghdad
+
+## More banks, payments, crypto
+Bank of China
+ICBC
+China Construction Bank
+Mizuho
+MUFG
+Sumitomo
+Nomura
+Credit Agricole
+Crédit Agricole
+Societe Generale
+Société Générale
+Natixis
+UniCredit
+Intesa Sanpaolo
+BBVA
+CaixaBank
+ABN AMRO
+Rabobank
+Nordea
+Danske Bank
+Swedbank
+Erste
+OTP Bank
+PKO
+mBank
+Garanti BBVA
+Akbank
+Isbank
+Yapi Kredi
+Halkbank
+VakifBank
+QNB
+Emirates Islamic
+Dubai Islamic Bank
+Abu Dhabi Islamic Bank
+Kuwait Finance House
+Islamic Development Bank
+Asian Development Bank
+World Bank
+IMF
+EBRD
+BlackRock
+Vanguard
+Fidelity
+Charles Schwab
+Robinhood
+eToro
+Interactive Brokers
+Apple Card
+Google Wallet
+Paytm
+PhonePe
+Kaspi Gold
+Freedom Finance
+Tabby
+Afterpay
+Square
+Cash App
+Bitfinex
+Huobi
+Gate.io
+MEXC
+Bitget
+MetaMask
+Trust Wallet
+Trezor
+Tonkeeper
+Cardano
+Polkadot
+Chainlink
+Shiba Inu
+TRON
+BNB
+XRP
+USDC
+
+## Perfume and cosmetics
+Shiseido
+Kiehl's
+CeraVe
+The Ordinary
+Neutrogena
+Eucerin
+Avene
+Avène
+Uriage
+Nuxe
+Caudalie
+Clarins
+Guerlain
+Tom Ford
+Jo Malone
+Byredo
+Kilian
+Montale
+Mancera
+Lattafa
+Rasasi
+Al Haramain
+Arabian Oud
+Swiss Arabian
+Davidoff
+Paco Rabanne
+Carolina Herrera
+Yves Rocher
+Bourjois
+Rimmel
+Max Factor
+NYX
+Catrice
+Huda Beauty
+Fenty
+Fenty Beauty
+Too Faced
+Urban Decay
+Anastasia Beverly Hills
+Charlotte Tilbury
+Rare Beauty
+Glossier
+Olaplex
+Moroccanoil
+Kerastase
+Kérastase
+Wella
+Redken
+Syoss
+Sunsilk
+Elseve
+Gliss Kur
+Timotei
+Palmolive
+Safeguard
+Protex
+Lifebuoy
+Camay
+Old Spice
+Hugo Boss Bottled
+Narciso Rodriguez
+Jean Paul Gaultier
+Kenzo
+Lalique
+Bvlgari
+Bulgari
+Chopard
+Tiffany
+Swarovski
+Hublot
+Rado
+G-Shock
+Daniel Wellington
+
+## More fashion and shoes
+Michael Kors
+Kate Spade
+Furla
+Benetton
+United Colors of Benetton
+Esprit
+Marks & Spencer
+River Island
+Topshop
+Off-White
+Stone Island
+Moncler
+Canada Goose
+UGG
+Dr. Martens
+Dr Martens
+Birkenstock
+Clarks
+Ecco
+ECCO
+Geox
+Hush Puppies
+Armani Exchange
+Max Mara
+Missoni
+Moschino
+Bottega Veneta
+Loewe
+Celine
+Miu Miu
+Jimmy Choo
+Christian Louboutin
+Louboutin
+Manolo Blahnik
+Victoria's Secret
+Intimissimi
+Calzedonia
+Tezenis
+Oysho
+Lefties
+Penti
+Yeezy
+Air Jordan
+Air Max
+Air Force
+Adidas Originals
+Superstar
+Stan Smith
+
+## More drinks and food
+Maxwell House
+Tchibo
+Illy
+Segafredo
+Greenfield
+Ahmad Tea
+Dilmah
+Tetley
+Twinings
+Brooke Bond
+Pickwick
+Fuse Tea
+Nestea
+Bonaqua
+BonAqua
+Aquafina
+Evian
+Perrier
+San Pellegrino
+Nabeglavi
+Pure Life
+Dasani
+Gatorade
+Powerade
+Rauch
+Tropicana
+Minute Maid
+Del Monte
+Dole
+Chiquita
+Corn Flakes
+Cheerios
+Quaker
+Nature Valley
+Hershey's
+Cadbury
+M&M's
+Skittles
+Tic Tac
+Trident
+Wrigley's
+Hubba Bubba
+Kinder Surprise
+Merci
+Roshen
+Lotte
+Choco Pie
+Nongshim
+Shin Ramyun
+Ulker
+Ülker
+Torku
+Sutas
+Valio
+Lactalis
+Hochland
+Arla
+Almette
+Bonduelle
+Calve
+Uncle Ben's
+Gallina Blanca
+Carl's Jr
+Dairy Queen
+Baskin-Robbins
+Krispy Kreme
+Cinnabon
+Arby's
+Chipotle
+Panda Express
+Little Caesars
+Sbarro
+Nando's
+Texas Chicken
+Jollibee
+Black Star Burger
+
+## More hotels
+DoubleTree
+Waldorf Astoria
+Conrad
+Westin
+St. Regis
+JW Marriott
+Courtyard
+Le Meridien
+Kempinski
+Mandarin Oriental
+Shangri-La
+Fairmont
+Raffles
+Sofitel
+Pullman
+Movenpick
+Mövenpick
+Swissotel
+Swissôtel
+Jumeirah
+Burj Al Arab
+Rotana
+Crowne Plaza
+Hampton Inn
+Embassy Suites
+Days Inn
+Travelodge
+Premier Inn
+Hyatt Regency
+Park Hyatt
+Andaz
+Aloft

@@ -30,7 +30,7 @@ Private gLoaded As Boolean
 Private gL2C As Collection, gL2CStem As Collection
 Private gC2L As Collection, gC2LStem As Collection
 Private gUL2C As Collection, gUC2L As Collection, gSkip As Collection
-Private gWeak As Collection, gAcr As Collection
+Private gWeak As Collection, gAcr As Collection, gBrand As Collection, gPhr As Collection
 Private gMaxL2C As Long, gMaxC2L As Long
 Private gLugatStamp As String
 Private gTestN As Long, gTestFail As Long, gTestMsg As String
@@ -151,7 +151,12 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
             For k = cnt To 1 Step -1
                 If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) > 0 Then GoTo NextTok
                 tok = Mid$(t, starts(k), lens(k))
-                If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+                If toLat Then
+                    outS = WordToLat(tok)
+                Else
+                    ' a single letter before a dot is an initial (M. Yusuf), not a Roman numeral
+                    outS = WordToCyr(tok, lens(k) = 1 And Mid$(t, starts(k) + 1, 1) = ".")
+                End If
                 If StrComp(outS, tok, vbBinaryCompare) <> 0 Then
                     a = pr.Start + starts(k) - 1
                     b = a + lens(k)
@@ -321,7 +326,11 @@ Private Function ConvertText(ByVal s As String, ByVal toLat As Boolean) As Strin
     For k = cnt To 1 Step -1
         If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) = 0 Then
             tok = Mid$(s, starts(k), lens(k))
-            If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+            If toLat Then
+                outS = WordToLat(tok)
+            Else
+                outS = WordToCyr(tok, lens(k) = 1 And Mid$(s, starts(k) + 1, 1) = ".")
+            End If
             s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
         End If
     Next k
@@ -330,9 +339,11 @@ End Function
 
 ' ============================== words
 
-Private Function WordToCyr(ByVal w As String) As String
+Private Function WordToCyr(ByVal w As String, Optional ByVal notRoman As Boolean = False) As String
     Dim norm As String, key As String, pat As Long, v As String, L As Long, maxL As Long
-    If IsRoman(w) Then WordToCyr = w: Exit Function
+    If Not notRoman Then
+        If IsRoman(w) Then WordToCyr = w: Exit Function
+    End If
     If KEEP_FOREIGN Then
         If IsStrongForeign(w) Then WordToCyr = w: Exit Function
     ElseIf IsForeign(w) Then
@@ -577,19 +588,60 @@ Private Function IsStrongForeign(ByVal w As String) As Boolean
         End If
     Next i
     lw = LC(w): L = Len(lw)
-    If CHas(gAcr, lw) Then IsStrongForeign = True: Exit Function
+    If CHas(gAcr, lw) Then
+        ' short ones only in capitals (VIP, SMS, IP) - "ip" is an Uzbek word
+        If L > 3 Or (L > 1 And StrComp(w, UC(w), vbBinaryCompare) = 0) Then IsStrongForeign = True: Exit Function
+    End If
     If L < 4 Then Exit Function
     If InStr(1, lw, "ph", vbBinaryCompare) > 0 Or InStr(1, lw, "gh", vbBinaryCompare) > 0 Or _
        InStr(1, lw, "ck", vbBinaryCompare) > 0 Then IsStrongForeign = True: Exit Function
     i = InStr(1, lw, "ee", vbBinaryCompare)
     Do While i > 0
-        If Not IsApos(Mid$(lw, i + 2, 1)) Then IsStrongForeign = True: Exit Function
+        If Not IsApos(Mid$(lw, i + 2, 1)) And Not (i > 3 And Mid$(lw, i - 3, 3) = "tel") Then IsStrongForeign = True: Exit Function
         i = InStr(i + 1, lw, "ee", vbBinaryCompare)
     Loop
     p = Mid$(lw, L - 2, 1)
     If Right$(lw, 2) = "le" And InStr(1, "aeiou", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
     p = Mid$(lw, L - 1, 1)
     If Right$(lw, 1) = "y" And InStr(1, "aeiouy", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
+End Function
+
+Private Function BrandKey(ByVal w As String) As String
+    Dim i As Long, ch As String, r As String
+    w = LC(w)
+    For i = 1 To Len(w)
+        ch = Mid$(w, i, 1)
+        If IsApos(ch) Then r = r & "_" Else r = r & ch
+    Next i
+    BrandKey = r
+End Function
+
+' Brand name (data/brands.txt): "cap" = with a capital letter, "caps" = only in
+' capitals (BMW), "exact:X" = only spelled exactly X (vivo, UzA).
+Private Function IsBrandWord(ByVal w As String) As Boolean
+    Dim mode As String
+    If Not CGet(gBrand, BrandKey(w), mode) Then Exit Function
+    If mode = "cap" Then
+        IsBrandWord = IsUpperCh(Left$(w, 1))
+    ElseIf mode = "caps" Then
+        IsBrandWord = Len(w) > 1 And StrComp(w, UC(w), vbBinaryCompare) = 0
+    Else
+        IsBrandWord = (StrComp(w, Mid$(mode, 7), vbBinaryCompare) = 0)
+    End If
+End Function
+
+Private Function IsPhraseGap(ByVal g As String) As Boolean
+    g = Replace(g, ChrW(&HA0), " ")
+    Select Case g
+        Case " ", "-", ".", "&", "+", " -", "- ", " - ", " .", ". ", " . ", " &", "& ", " & ", " +", "+ ", " + "
+            IsPhraseGap = True
+    End Select
+End Function
+
+Private Function IsAccented(ByVal ch As String) As Boolean
+    Dim c As Long
+    c = U16(ch)
+    IsAccented = (c >= &HC0 And c <= &H24F And c <> &HD7 And c <> &HF7)
 End Function
 
 ' English word from the list (Seven, Gold, Smarts) - only counts inside short names.
@@ -612,9 +664,38 @@ Private Function ForeignMask(ByVal t As String, starts() As Long, lens() As Long
     ReDim strong(1 To cnt): ReDim foreign(1 To cnt)
     For k = 1 To cnt
         strong(k) = IsStrongForeign(Mid$(t, starts(k), lens(k)))
+        If Not strong(k) Then strong(k) = IsBrandWord(Mid$(t, starts(k), lens(k)))
+        ' next to a letter with an accent (Ulker with U-umlaut, Citroen with e-diaeresis)
+        If Not strong(k) And starts(k) > 1 Then strong(k) = IsAccented(Mid$(t, starts(k) - 1, 1))
+        If Not strong(k) Then strong(k) = IsAccented(Mid$(t, starts(k) + lens(k), 1))
         foreign(k) = strong(k)
         If Not strong(k) Then foreign(k) = IsWeakForeign(Mid$(t, starts(k), lens(k)))
         If strong(k) Then Mid$(m, starts(k), lens(k)) = String$(lens(k), "1")
+    Next k
+    ' brand phrases: American Express, Turkish Airlines, Kun.uz
+    Dim cands As String, ph() As String, pw() As String, c As Long, q As Long, ok As Boolean
+    For k = 1 To cnt
+        If IsUpperCh(Mid$(t, starts(k), 1)) Then
+            If CGet(gPhr, BrandKey(Mid$(t, starts(k), lens(k))), cands) Then
+                ph = Split(cands, "|")
+                For c = LBound(ph) To UBound(ph)
+                    pw = Split(ph(c), " ")
+                    ok = (k + UBound(pw) <= cnt)
+                    q = 1
+                    Do While ok And q <= UBound(pw)
+                        If BrandKey(Mid$(t, starts(k + q), lens(k + q))) <> pw(q) Then ok = False
+                        If ok Then ok = IsPhraseGap(Mid$(t, starts(k + q - 1) + lens(k + q - 1), starts(k + q) - starts(k + q - 1) - lens(k + q - 1)))
+                        q = q + 1
+                    Loop
+                    If ok Then
+                        For q = 0 To UBound(pw)
+                            strong(k + q) = True: foreign(k + q) = True
+                            Mid$(m, starts(k + q), lens(k + q)) = String$(lens(k + q), "1")
+                        Next q
+                    End If
+                Next c
+            End If
+        End If
     Next k
     ' short names in quotes
     opens = ChrW(&HAB) & ChrW(&H201C) & ChrW(&H201E) & """"
@@ -898,6 +979,7 @@ Private Sub LoadAll()
         Set gC2L = New Collection: Set gC2LStem = New Collection
         Set gUL2C = New Collection: Set gUC2L = New Collection: Set gSkip = New Collection
         Set gWeak = New Collection: Set gAcr = New Collection
+        Set gBrand = New Collection: Set gPhr = New Collection
         gMaxL2C = 0: gMaxC2L = 0
         LoadData
         gLoaded = True
@@ -995,6 +1077,31 @@ Private Sub AddWeak(ByVal words As String)
     a = Split(words, " ")
     For i = LBound(a) To UBound(a)
         If Len(a(i)) > 0 Then CAdd gWeak, a(i), "1"
+    Next i
+End Sub
+
+' "key=mode key=mode ..."
+Private Sub AddBrand(ByVal items As String)
+    Dim a() As String, i As Long, e As Long
+    a = Split(items, " ")
+    For i = LBound(a) To UBound(a)
+        e = InStr(1, a(i), "=")
+        If e > 0 Then CAdd gBrand, Left$(a(i), e - 1), Mid$(a(i), e + 1)
+    Next i
+End Sub
+
+' "word word|word word word" - phrases, indexed by their first word
+Private Sub AddPhrase(ByVal items As String)
+    Dim a() As String, i As Long, first As String, old As String
+    a = Split(items, "|")
+    For i = LBound(a) To UBound(a)
+        first = Split(a(i), " ")(0)
+        If CGet(gPhr, first, old) Then
+            gPhr.Remove first
+            gPhr.Add old & "|" & a(i), first
+        Else
+            gPhr.Add a(i), first
+        End If
     Next i
 End Sub
 

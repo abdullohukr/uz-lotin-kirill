@@ -1,0 +1,2965 @@
+{
+"words": {
+"visa": "cap",
+"mastercard": "cap",
+"amex": "cap",
+"unionpay": "exact:UnionPay",
+"jcb": "caps",
+"discover": "cap",
+"paypal": "exact:PayPal",
+"payoneer": "cap",
+"stripe": "cap",
+"skrill": "cap",
+"neteller": "cap",
+"wise": "cap",
+"transferwise": "exact:TransferWise",
+"revolut": "cap",
+"moneygram": "exact:MoneyGram",
+"contact": "cap",
+"swift": "cap",
+"alipay": "cap",
+"venmo": "cap",
+"zelle": "cap",
+"klarna": "cap",
+"payme": "cap",
+"click": "cap",
+"paynet": "cap",
+"uzcard": "cap",
+"raiffeisen": "cap",
+"raiffeisenbank": "cap",
+"citibank": "cap",
+"citi": "cap",
+"hsbc": "caps",
+"barclays": "cap",
+"jpmorgan": "exact:JPMorgan",
+"chase": "cap",
+"commerzbank": "cap",
+"ubs": "caps",
+"ing": "caps",
+"lloyds": "cap",
+"natwest": "exact:NatWest",
+"kaspi": "cap",
+"bitcoin": "cap",
+"ethereum": "cap",
+"binance": "cap",
+"coinbase": "cap",
+"tether": "cap",
+"usdt": "caps",
+"litecoin": "cap",
+"dogecoin": "cap",
+"ripple": "cap",
+"toncoin": "cap",
+"bybit": "cap",
+"okx": "caps",
+"kucoin": "exact:KuCoin",
+"forex": "cap",
+"nasdaq": "cap",
+"nyse": "caps",
+"bloomberg": "cap",
+"reuters": "cap",
+"moody's": "cap",
+"fitch": "cap",
+"flyarystan": "exact:FlyArystan",
+"emirates": "cap",
+"etihad": "cap",
+"pegasus": "cap",
+"ajet": "exact:AJet",
+"lufthansa": "cap",
+"klm": "caps",
+"alitalia": "cap",
+"swiss": "cap",
+"ryanair": "cap",
+"easyjet": "exact:easyJet",
+"wizz": "cap",
+"southwest": "cap",
+"jetblue": "exact:JetBlue",
+"qantas": "cap",
+"asiana": "cap",
+"indigo": "exact:IndiGo",
+"saudia": "cap",
+"flynas": "cap",
+"flyadeal": "cap",
+"flydubai": "cap",
+"salamair": "exact:SalamAir",
+"egyptair": "exact:EgyptAir",
+"boeing": "cap",
+"airbus": "cap",
+"embraer": "cap",
+"bombardier": "cap",
+"toyota": "cap",
+"lexus": "cap",
+"honda": "cap",
+"acura": "cap",
+"nissan": "cap",
+"infiniti": "cap",
+"mazda": "cap",
+"subaru": "cap",
+"mitsubishi": "cap",
+"suzuki": "cap",
+"isuzu": "cap",
+"daihatsu": "cap",
+"hyundai": "cap",
+"kia": "cap",
+"genesis": "cap",
+"ssangyong": "exact:SsangYong",
+"daewoo": "cap",
+"chevrolet": "cap",
+"chevy": "cap",
+"cadillac": "cap",
+"buick": "cap",
+"gmc": "caps",
+"ford": "cap",
+"lincoln": "cap",
+"dodge": "cap",
+"jeep": "cap",
+"chrysler": "cap",
+"tesla": "cap",
+"rivian": "cap",
+"lucid": "cap",
+"volkswagen": "cap",
+"vw": "caps",
+"audi": "cap",
+"porsche": "cap",
+"bmw": "caps",
+"mercedes": "cap",
+"benz": "cap",
+"maybach": "cap",
+"opel": "cap",
+"skoda": "cap",
+"seat": "cap",
+"cupra": "cap",
+"renault": "cap",
+"peugeot": "cap",
+"citroen": "cap",
+"dacia": "cap",
+"fiat": "cap",
+"lancia": "cap",
+"ferrari": "cap",
+"lamborghini": "cap",
+"maserati": "cap",
+"bugatti": "cap",
+"bentley": "cap",
+"mclaren": "exact:McLaren",
+"lotus": "cap",
+"volvo": "cap",
+"polestar": "cap",
+"saab": "cap",
+"byd": "caps",
+"geely": "cap",
+"chery": "cap",
+"haval": "cap",
+"changan": "cap",
+"jac": "caps",
+"jetour": "cap",
+"exeed": "cap",
+"omoda": "cap",
+"jaecoo": "cap",
+"hongqi": "cap",
+"lifan": "cap",
+"dongfeng": "cap",
+"faw": "caps",
+"gac": "caps",
+"zeekr": "cap",
+"nio": "cap",
+"xpeng": "cap",
+"leapmotor": "cap",
+"voyah": "cap",
+"kaiyi": "cap",
+"scania": "cap",
+"iveco": "cap",
+"daf": "caps",
+"hino": "cap",
+"shacman": "cap",
+"howo": "cap",
+"sinotruk": "cap",
+"yutong": "cap",
+"higer": "cap",
+"otokar": "cap",
+"caterpillar": "cap",
+"komatsu": "cap",
+"yamaha": "cap",
+"kawasaki": "cap",
+"ducati": "cap",
+"ktm": "caps",
+"vespa": "cap",
+"nexia": "cap",
+"matiz": "cap",
+"spark": "cap",
+"cobalt": "cap",
+"lacetti": "cap",
+"gentra": "cap",
+"malibu": "cap",
+"captiva": "cap",
+"tracker": "cap",
+"equinox": "cap",
+"trailblazer": "cap",
+"traverse": "cap",
+"tahoe": "cap",
+"onix": "cap",
+"monza": "cap",
+"damas": "cap",
+"labo": "cap",
+"epica": "cap",
+"camaro": "cap",
+"corvette": "cap",
+"cruze": "cap",
+"aveo": "cap",
+"camry": "cap",
+"corolla": "cap",
+"prius": "cap",
+"prado": "cap",
+"rav": "caps",
+"highlander": "cap",
+"hilux": "cap",
+"yaris": "cap",
+"elantra": "cap",
+"tucson": "cap",
+"creta": "cap",
+"accent": "cap",
+"solaris": "cap",
+"palisade": "cap",
+"sportage": "cap",
+"sorento": "cap",
+"cerato": "cap",
+"carnival": "cap",
+"seltos": "cap",
+"mustang": "cap",
+"focus": "cap",
+"fiesta": "cap",
+"mondeo": "cap",
+"explorer": "cap",
+"ranger": "cap",
+"tiguan": "cap",
+"touareg": "cap",
+"jetta": "cap",
+"octavia": "cap",
+"superb": "cap",
+"kodiaq": "cap",
+"duster": "cap",
+"sandero": "cap",
+"megane": "cap",
+"qashqai": "cap",
+"altima": "cap",
+"civic": "cap",
+"accord": "cap",
+"outlander": "cap",
+"pajero": "cap",
+"lancer": "cap",
+"forester": "cap",
+"outback": "cap",
+"impreza": "cap",
+"cybertruck": "cap",
+"tiggo": "cap",
+"arrizo": "cap",
+"coolray": "cap",
+"monjaro": "cap",
+"apple": "cap",
+"iphone": "exact:iPhone",
+"ipad": "exact:iPad",
+"ipod": "exact:iPod",
+"imac": "exact:iMac",
+"macbook": "exact:MacBook",
+"airpods": "exact:AirPods",
+"ios": "exact:iOS",
+"ipados": "exact:iPadOS",
+"macos": "exact:macOS",
+"watchos": "exact:watchOS",
+"icloud": "exact:iCloud",
+"itunes": "exact:iTunes",
+"facetime": "exact:FaceTime",
+"google": "cap",
+"gmail": "cap",
+"android": "cap",
+"chrome": "cap",
+"chromebook": "cap",
+"pixel": "cap",
+"youtube": "exact:YouTube",
+"alphabet": "cap",
+"microsoft": "cap",
+"windows": "cap",
+"office": "cap",
+"word": "cap",
+"excel": "cap",
+"powerpoint": "exact:PowerPoint",
+"outlook": "cap",
+"onedrive": "exact:OneDrive",
+"onenote": "exact:OneNote",
+"teams": "cap",
+"skype": "cap",
+"xbox": "cap",
+"bing": "cap",
+"azure": "cap",
+"copilot": "cap",
+"linkedin": "exact:LinkedIn",
+"github": "exact:GitHub",
+"samsung": "cap",
+"galaxy": "cap",
+"huawei": "cap",
+"honor": "cap",
+"xiaomi": "cap",
+"redmi": "cap",
+"poco": "cap",
+"oppo": "cap",
+"vivo": "cap",
+"realme": "cap",
+"oneplus": "exact:OnePlus",
+"nokia": "cap",
+"motorola": "cap",
+"sony": "cap",
+"playstation": "exact:PlayStation",
+"panasonic": "cap",
+"toshiba": "cap",
+"hitachi": "cap",
+"sharp": "cap",
+"canon": "cap",
+"nikon": "cap",
+"fujifilm": "cap",
+"olympus": "cap",
+"casio": "cap",
+"seiko": "cap",
+"citizen": "cap",
+"lg": "caps",
+"philips": "cap",
+"siemens": "cap",
+"bosch": "cap",
+"dyson": "cap",
+"electrolux": "cap",
+"whirlpool": "cap",
+"beko": "cap",
+"arcelik": "cap",
+"vestel": "cap",
+"indesit": "cap",
+"hotpoint": "cap",
+"gorenje": "cap",
+"miele": "cap",
+"haier": "cap",
+"midea": "cap",
+"gree": "cap",
+"hisense": "cap",
+"tcl": "caps",
+"lenovo": "cap",
+"thinkpad": "exact:ThinkPad",
+"dell": "cap",
+"hp": "caps",
+"asus": "cap",
+"acer": "cap",
+"msi": "caps",
+"razer": "cap",
+"logitech": "cap",
+"intel": "cap",
+"amd": "caps",
+"nvidia": "cap",
+"geforce": "exact:GeForce",
+"qualcomm": "cap",
+"snapdragon": "cap",
+"mediatek": "exact:MediaTek",
+"arm": "caps",
+"ibm": "caps",
+"oracle": "cap",
+"cisco": "cap",
+"sap": "caps",
+"salesforce": "cap",
+"adobe": "cap",
+"photoshop": "cap",
+"illustrator": "cap",
+"indesign": "exact:InDesign",
+"acrobat": "cap",
+"lightroom": "cap",
+"figma": "cap",
+"canva": "cap",
+"autodesk": "cap",
+"autocad": "exact:AutoCAD",
+"unity": "cap",
+"linux": "cap",
+"ubuntu": "cap",
+"debian": "cap",
+"mozilla": "cap",
+"firefox": "cap",
+"avast": "cap",
+"eset": "caps",
+"norton": "cap",
+"mcafee": "exact:McAfee",
+"dropbox": "cap",
+"zoom": "cap",
+"slack": "cap",
+"notion": "cap",
+"trello": "cap",
+"jira": "cap",
+"atlassian": "cap",
+"evernote": "cap",
+"spotify": "cap",
+"shazam": "cap",
+"soundcloud": "exact:SoundCloud",
+"netflix": "cap",
+"disney": "cap",
+"hbo": "caps",
+"hulu": "cap",
+"twitch": "cap",
+"steam": "cap",
+"valve": "cap",
+"nintendo": "cap",
+"switch": "cap",
+"ubisoft": "cap",
+"activision": "cap",
+"blizzard": "cap",
+"ea": "caps",
+"rockstar": "cap",
+"pubg": "caps",
+"fortnite": "cap",
+"minecraft": "cap",
+"roblox": "cap",
+"dota": "cap",
+"gta": "caps",
+"spacex": "exact:SpaceX",
+"starlink": "cap",
+"openai": "exact:OpenAI",
+"chatgpt": "exact:ChatGPT",
+"gpt": "caps",
+"claude": "cap",
+"anthropic": "cap",
+"gemini": "cap",
+"deepseek": "exact:DeepSeek",
+"midjourney": "cap",
+"perplexity": "cap",
+"grok": "cap",
+"xai": "exact:xAI",
+"meta": "cap",
+"facebook": "cap",
+"instagram": "cap",
+"whatsapp": "exact:WhatsApp",
+"messenger": "cap",
+"threads": "cap",
+"telegram": "cap",
+"viber": "cap",
+"wechat": "exact:WeChat",
+"kakaotalk": "exact:KakaoTalk",
+"tiktok": "exact:TikTok",
+"douyin": "cap",
+"bytedance": "exact:ByteDance",
+"snapchat": "cap",
+"pinterest": "cap",
+"reddit": "cap",
+"tumblr": "cap",
+"quora": "cap",
+"twitter": "cap",
+"discord": "cap",
+"clubhouse": "cap",
+"likee": "cap",
+"kwai": "cap",
+"tinder": "cap",
+"bumble": "cap",
+"wikipedia": "cap",
+"amazon": "cap",
+"ebay": "exact:eBay",
+"aliexpress": "exact:AliExpress",
+"alibaba": "cap",
+"taobao": "cap",
+"temu": "cap",
+"shein": "cap",
+"wildberries": "cap",
+"olx": "caps",
+"avito": "cap",
+"etsy": "cap",
+"shopify": "cap",
+"booking": "cap",
+"airbnb": "cap",
+"expedia": "cap",
+"tripadvisor": "cap",
+"skyscanner": "cap",
+"aviasales": "cap",
+"uber": "cap",
+"lyft": "cap",
+"mytaxi": "exact:MyTaxi",
+"glovo": "cap",
+"wolt": "cap",
+"express": "cap",
+"deliveroo": "cap",
+"doordash": "exact:DoorDash",
+"grab": "cap",
+"gojek": "cap",
+"duolingo": "cap",
+"coursera": "cap",
+"udemy": "cap",
+"edx": "exact:edX",
+"quizlet": "cap",
+"kahoot": "cap",
+"grammarly": "cap",
+"speedtest": "cap",
+"ookla": "cap",
+"truecaller": "cap",
+"hotmail": "cap",
+"yahoo": "cap",
+"beeline": "cap",
+"ucell": "cap",
+"mobiuz": "cap",
+"uzmobile": "cap",
+"humans": "cap",
+"perfectum": "cap",
+"vodafone": "cap",
+"orange": "cap",
+"verizon": "cap",
+"kcell": "cap",
+"turkcell": "cap",
+"nike": "cap",
+"adidas": "cap",
+"reebok": "cap",
+"asics": "cap",
+"fila": "cap",
+"kappa": "cap",
+"umbro": "cap",
+"columbia": "cap",
+"timberland": "cap",
+"converse": "cap",
+"vans": "cap",
+"skechers": "cap",
+"salomon": "cap",
+"crocs": "cap",
+"lacoste": "cap",
+"levi's": "cap",
+"wrangler": "cap",
+"armani": "cap",
+"gucci": "cap",
+"prada": "cap",
+"chanel": "cap",
+"dior": "cap",
+"hermes": "cap",
+"versace": "cap",
+"givenchy": "cap",
+"balenciaga": "cap",
+"burberry": "cap",
+"fendi": "cap",
+"valentino": "cap",
+"cartier": "cap",
+"rolex": "cap",
+"tissot": "cap",
+"swatch": "cap",
+"longines": "cap",
+"breitling": "cap",
+"montblanc": "cap",
+"bershka": "cap",
+"stradivarius": "cap",
+"uniqlo": "cap",
+"primark": "cap",
+"koton": "cap",
+"defacto": "exact:DeFacto",
+"mavi": "cap",
+"colin's": "cap",
+"ikea": "cap",
+"l'oreal": "exact:L'Oreal",
+"maybelline": "cap",
+"garnier": "cap",
+"nivea": "cap",
+"dove": "cap",
+"rexona": "cap",
+"axe": "cap",
+"gillette": "cap",
+"colgate": "cap",
+"pantene": "cap",
+"schwarzkopf": "cap",
+"avon": "cap",
+"oriflame": "cap",
+"clinique": "cap",
+"lancome": "cap",
+"mac": "caps",
+"sephora": "cap",
+"bioderma": "cap",
+"vichy": "cap",
+"unilever": "cap",
+"henkel": "cap",
+"tide": "cap",
+"persil": "cap",
+"fairy": "cap",
+"domestos": "cap",
+"vanish": "cap",
+"pampers": "cap",
+"huggies": "cap",
+"coke": "cap",
+"pepsi": "cap",
+"pepsico": "exact:PepsiCo",
+"fanta": "cap",
+"sprite": "cap",
+"mirinda": "cap",
+"schweppes": "cap",
+"monster": "cap",
+"burn": "cap",
+"lipton": "cap",
+"nescafe": "cap",
+"nestle": "cap",
+"jacobs": "cap",
+"lavazza": "cap",
+"starbucks": "cap",
+"dunkin": "cap",
+"danone": "cap",
+"activia": "cap",
+"actimel": "cap",
+"ferrero": "cap",
+"nutella": "cap",
+"kinder": "cap",
+"raffaello": "cap",
+"milka": "cap",
+"toblerone": "cap",
+"snickers": "cap",
+"twix": "cap",
+"bounty": "cap",
+"kitkat": "exact:KitKat",
+"oreo": "cap",
+"lay's": "cap",
+"pringles": "cap",
+"cheetos": "cap",
+"doritos": "cap",
+"heinz": "cap",
+"knorr": "cap",
+"maggi": "cap",
+"hellmann's": "cap",
+"barilla": "cap",
+"kellogg's": "cap",
+"nesquik": "cap",
+"orbit": "cap",
+"dirol": "cap",
+"mentos": "cap",
+"haribo": "cap",
+"lindt": "cap",
+"heineken": "cap",
+"carlsberg": "cap",
+"tuborg": "cap",
+"mcdonald's": "exact:McDonald's",
+"kfc": "caps",
+"subway": "cap",
+"domino's": "cap",
+"wendy's": "cap",
+"popeyes": "cap",
+"hardee's": "cap",
+"evos": "cap",
+"bellissimo": "cap",
+"hilton": "cap",
+"marriott": "cap",
+"sheraton": "cap",
+"hyatt": "cap",
+"radisson": "cap",
+"intercontinental": "exact:InterContinental",
+"novotel": "cap",
+"ibis": "cap",
+"accor": "cap",
+"wyndham": "cap",
+"ramada": "cap",
+"mercure": "cap",
+"rixos": "cap",
+"walmart": "cap",
+"costco": "cap",
+"carrefour": "cap",
+"tesco": "cap",
+"auchan": "cap",
+"lidl": "cap",
+"spar": "caps",
+"mediapark": "cap",
+"texnomart": "cap",
+"bbc": "caps",
+"cnn": "caps",
+"euronews": "cap",
+"cnbc": "caps",
+"nbc": "caps",
+"ap": "caps",
+"afp": "caps",
+"forbes": "cap",
+"fortune": "cap",
+"discovery": "cap",
+"eurosport": "cap",
+"espn": "caps",
+"uza": "exact:UzA",
+"aws": "caps",
+"pixar": "cap",
+"marvel": "cap",
+"lego": "cap",
+"mattel": "cap",
+"barbie": "cap",
+"hasbro": "cap",
+"pokemon": "cap",
+"xerox": "cap",
+"kodak": "cap",
+"polaroid": "cap",
+"shell": "cap",
+"bp": "caps",
+"exxonmobil": "exact:ExxonMobil",
+"chevron": "cap",
+"totalenergies": "exact:TotalEnergies",
+"aramco": "cap",
+"petronas": "cap",
+"honeywell": "cap",
+"pfizer": "cap",
+"moderna": "cap",
+"astrazeneca": "exact:AstraZeneca",
+"novartis": "cap",
+"roche": "cap",
+"sanofi": "cap",
+"bayer": "cap",
+"gsk": "caps",
+"teva": "cap",
+"abbott": "cap",
+"medtronic": "cap",
+"fedex": "exact:FedEx",
+"dhl": "caps",
+"ups": "caps",
+"maersk": "cap",
+"tnt": "caps",
+"alpina": "cap",
+"abarth": "cap",
+"optima": "cap",
+"picanto": "cap",
+"stinger": "cap",
+"telluride": "cap",
+"mohave": "cap",
+"ioniq": "cap",
+"kona": "cap",
+"staria": "cap",
+"starex": "cap",
+"getz": "cap",
+"avalon": "cap",
+"fortuner": "cap",
+"sequoia": "cap",
+"tacoma": "cap",
+"sienna": "cap",
+"venza": "cap",
+"alphard": "cap",
+"vellfire": "cap",
+"teana": "cap",
+"juke": "cap",
+"murano": "cap",
+"pathfinder": "cap",
+"navara": "cap",
+"tiida": "cap",
+"almera": "cap",
+"galant": "cap",
+"montero": "cap",
+"teramont": "cap",
+"touran": "cap",
+"caddy": "cap",
+"amarok": "cap",
+"arteon": "cap",
+"vito": "cap",
+"actros": "cap",
+"quattro": "cap",
+"cayenne": "cap",
+"macan": "cap",
+"panamera": "cap",
+"taycan": "cap",
+"defender": "cap",
+"evoque": "cap",
+"velar": "cap",
+"silverado": "cap",
+"suburban": "cap",
+"blazer": "cap",
+"atto": "cap",
+"emgrand": "cap",
+"tugella": "cap",
+"jolion": "cap",
+"dargo": "cap",
+"escalade": "cap",
+"cherokee": "cap",
+"compass": "cap",
+"charger": "cap",
+"challenger": "cap",
+"durango": "cap",
+"bronco": "cap",
+"kuga": "cap",
+"escape": "cap",
+"edge": "cap",
+"expedition": "cap",
+"maverick": "cap",
+"fusion": "cap",
+"countryman": "cap",
+"insignia": "cap",
+"corsa": "cap",
+"zafira": "cap",
+"mokka": "cap",
+"clio": "cap",
+"arkana": "cap",
+"kaptur": "cap",
+"koleos": "cap",
+"fluence": "cap",
+"berlingo": "cap",
+"ducato": "cap",
+"doblo": "cap",
+"tipo": "cap",
+"punto": "cap",
+"giulia": "cap",
+"stelvio": "cap",
+"huracan": "cap",
+"aventador": "cap",
+"urus": "cap",
+"cullinan": "cap",
+"phantom": "cap",
+"ghost": "cap",
+"bentayga": "cap",
+"vantage": "cap",
+"dbx": "caps",
+"xc": "caps",
+"kindle": "cap",
+"alexa": "cap",
+"roku": "cap",
+"gopro": "exact:GoPro",
+"dji": "caps",
+"garmin": "cap",
+"fitbit": "cap",
+"infinix": "cap",
+"tecno": "cap",
+"itel": "cap",
+"blackview": "cap",
+"ulefone": "cap",
+"doogee": "cap",
+"zte": "caps",
+"alcatel": "cap",
+"blackberry": "exact:BlackBerry",
+"htc": "caps",
+"meizu": "cap",
+"zenfone": "cap",
+"rog": "caps",
+"surface": "cap",
+"oculus": "cap",
+"airtag": "exact:AirTag",
+"homepod": "exact:HomePod",
+"imessage": "exact:iMessage",
+"keynote": "cap",
+"garageband": "exact:GarageBand",
+"xcode": "cap",
+"jbl": "caps",
+"bose": "cap",
+"sennheiser": "cap",
+"beats": "cap",
+"tefal": "cap",
+"moulinex": "cap",
+"rowenta": "cap",
+"kenwood": "cap",
+"delonghi": "cap",
+"krups": "cap",
+"nespresso": "cap",
+"scarlett": "cap",
+"vitek": "cap",
+"shivaki": "cap",
+"hofmann": "cap",
+"candy": "cap",
+"smeg": "cap",
+"liebherr": "cap",
+"daikin": "cap",
+"carrier": "cap",
+"epson": "cap",
+"brother": "cap",
+"kyocera": "cap",
+"ricoh": "cap",
+"seagate": "cap",
+"sandisk": "exact:SanDisk",
+"transcend": "cap",
+"corsair": "cap",
+"hyperx": "exact:HyperX",
+"netgear": "cap",
+"mikrotik": "exact:MikroTik",
+"ubiquiti": "cap",
+"javascript": "exact:JavaScript",
+"typescript": "exact:TypeScript",
+"python": "cap",
+"kotlin": "cap",
+"golang": "cap",
+"php": "caps",
+"nodejs": "exact:NodeJS",
+"react": "cap",
+"angular": "cap",
+"django": "cap",
+"flask": "cap",
+"laravel": "cap",
+"symfony": "cap",
+"wordpress": "exact:WordPress",
+"joomla": "cap",
+"drupal": "cap",
+"wix": "cap",
+"bitrix": "cap",
+"magento": "cap",
+"mysql": "exact:MySQL",
+"postgresql": "exact:PostgreSQL",
+"mongodb": "exact:MongoDB",
+"redis": "cap",
+"sqlite": "exact:SQLite",
+"docker": "cap",
+"kubernetes": "cap",
+"git": "cap",
+"gitlab": "exact:GitLab",
+"bitbucket": "cap",
+"jenkins": "cap",
+"postman": "cap",
+"intellij": "exact:IntelliJ",
+"pycharm": "exact:PyCharm",
+"webstorm": "exact:WebStorm",
+"cloudflare": "cap",
+"digitalocean": "exact:DigitalOcean",
+"heroku": "cap",
+"vercel": "cap",
+"netlify": "cap",
+"firebase": "cap",
+"supabase": "cap",
+"hetzner": "cap",
+"ovh": "caps",
+"godaddy": "exact:GoDaddy",
+"namecheap": "cap",
+"tableau": "cap",
+"jupyter": "cap",
+"tensorflow": "exact:TensorFlow",
+"pytorch": "exact:PyTorch",
+"stackoverflow": "exact:StackOverflow",
+"leetcode": "exact:LeetCode",
+"codeforces": "cap",
+"kaggle": "cap",
+"replit": "cap",
+"moodle": "cap",
+"webex": "cap",
+"botim": "cap",
+"tamtam": "exact:TamTam",
+"rambler": "cap",
+"protonmail": "exact:ProtonMail",
+"capcut": "exact:CapCut",
+"inshot": "exact:InShot",
+"vsco": "caps",
+"snapseed": "cap",
+"picsart": "exact:PicsArt",
+"remini": "cap",
+"faceapp": "exact:FaceApp",
+"waze": "cap",
+"yango": "cap",
+"indrive": "exact:inDrive",
+"indriver": "exact:inDriver",
+"careem": "cap",
+"talabat": "cap",
+"trendyol": "cap",
+"hepsiburada": "cap",
+"lamoda": "cap",
+"joom": "cap",
+"lazada": "cap",
+"shopee": "cap",
+"flipkart": "cap",
+"rakuten": "cap",
+"zalando": "cap",
+"farfetch": "cap",
+"vinted": "cap",
+"depop": "cap",
+"pinduoduo": "cap",
+"meituan": "cap",
+"baidu": "cap",
+"tencent": "cap",
+"weibo": "cap",
+"youku": "cap",
+"bilibili": "cap",
+"naver": "cap",
+"tetris": "cap",
+"zelda": "cap",
+"valorant": "cap",
+"overwatch": "cap",
+"warcraft": "cap",
+"starcraft": "exact:StarCraft",
+"diablo": "cap",
+"hearthstone": "cap",
+"battlefield": "cap",
+"tekken": "cap",
+"hitman": "cap",
+"cyberpunk": "cap",
+"skyrim": "cap",
+"fallout": "cap",
+"halo": "cap",
+"forza": "cap",
+"simcity": "exact:SimCity",
+"standoff": "cap",
+"notcoin": "cap",
+"eurowings": "cap",
+"condor": "cap",
+"tui": "caps",
+"jet": "cap",
+"norwegian": "cap",
+"sas": "caps",
+"finnair": "cap",
+"airbaltic": "exact:airBaltic",
+"vueling": "cap",
+"volotea": "cap",
+"aegean": "cap",
+"tarom": "cap",
+"belavia": "cap",
+"pia": "caps",
+"biman": "cap",
+"airasia": "exact:AirAsia",
+"starlux": "cap",
+"virgin": "cap",
+"jetstar": "cap",
+"latam": "caps",
+"avianca": "cap",
+"aeromexico": "cap",
+"tunisair": "cap",
+"rwandair": "exact:RwandAir",
+"icbc": "caps",
+"mizuho": "cap",
+"mufg": "caps",
+"sumitomo": "cap",
+"nomura": "cap",
+"natixis": "cap",
+"unicredit": "exact:UniCredit",
+"bbva": "caps",
+"caixabank": "exact:CaixaBank",
+"rabobank": "cap",
+"nordea": "cap",
+"swedbank": "cap",
+"erste": "cap",
+"pko": "caps",
+"mbank": "exact:mBank",
+"akbank": "cap",
+"isbank": "cap",
+"halkbank": "cap",
+"vakifbank": "exact:VakifBank",
+"qnb": "caps",
+"imf": "caps",
+"ebrd": "caps",
+"blackrock": "exact:BlackRock",
+"vanguard": "cap",
+"fidelity": "cap",
+"robinhood": "cap",
+"etoro": "exact:eToro",
+"paytm": "cap",
+"phonepe": "exact:PhonePe",
+"tabby": "cap",
+"afterpay": "cap",
+"square": "cap",
+"bitfinex": "cap",
+"huobi": "cap",
+"mexc": "caps",
+"bitget": "cap",
+"metamask": "exact:MetaMask",
+"trezor": "cap",
+"tonkeeper": "cap",
+"cardano": "cap",
+"polkadot": "cap",
+"chainlink": "cap",
+"tron": "caps",
+"bnb": "caps",
+"xrp": "caps",
+"usdc": "caps",
+"shiseido": "cap",
+"kiehl's": "cap",
+"cerave": "exact:CeraVe",
+"neutrogena": "cap",
+"eucerin": "cap",
+"avene": "cap",
+"uriage": "cap",
+"nuxe": "cap",
+"caudalie": "cap",
+"clarins": "cap",
+"guerlain": "cap",
+"byredo": "cap",
+"kilian": "cap",
+"montale": "cap",
+"mancera": "cap",
+"lattafa": "cap",
+"rasasi": "cap",
+"davidoff": "cap",
+"bourjois": "cap",
+"rimmel": "cap",
+"nyx": "caps",
+"catrice": "cap",
+"fenty": "cap",
+"glossier": "cap",
+"olaplex": "cap",
+"moroccanoil": "cap",
+"kerastase": "cap",
+"wella": "cap",
+"redken": "cap",
+"syoss": "cap",
+"sunsilk": "cap",
+"elseve": "cap",
+"timotei": "cap",
+"palmolive": "cap",
+"safeguard": "cap",
+"protex": "cap",
+"lifebuoy": "cap",
+"camay": "cap",
+"kenzo": "cap",
+"lalique": "cap",
+"bvlgari": "cap",
+"bulgari": "cap",
+"chopard": "cap",
+"tiffany": "cap",
+"swarovski": "cap",
+"hublot": "cap",
+"rado": "cap",
+"furla": "cap",
+"benetton": "cap",
+"esprit": "cap",
+"topshop": "cap",
+"moncler": "cap",
+"ugg": "caps",
+"birkenstock": "cap",
+"clarks": "cap",
+"ecco": "cap",
+"geox": "cap",
+"missoni": "cap",
+"moschino": "cap",
+"loewe": "cap",
+"celine": "cap",
+"louboutin": "cap",
+"intimissimi": "cap",
+"calzedonia": "cap",
+"tezenis": "cap",
+"oysho": "cap",
+"lefties": "cap",
+"penti": "cap",
+"yeezy": "cap",
+"superstar": "cap",
+"tchibo": "cap",
+"illy": "cap",
+"segafredo": "cap",
+"greenfield": "cap",
+"dilmah": "cap",
+"tetley": "cap",
+"twinings": "cap",
+"pickwick": "cap",
+"nestea": "cap",
+"bonaqua": "cap",
+"aquafina": "cap",
+"evian": "cap",
+"perrier": "cap",
+"nabeglavi": "cap",
+"dasani": "cap",
+"gatorade": "cap",
+"powerade": "cap",
+"rauch": "cap",
+"tropicana": "cap",
+"dole": "cap",
+"chiquita": "cap",
+"cheerios": "cap",
+"quaker": "cap",
+"hershey's": "cap",
+"cadbury": "cap",
+"skittles": "cap",
+"trident": "cap",
+"wrigley's": "cap",
+"merci": "cap",
+"roshen": "cap",
+"lotte": "cap",
+"nongshim": "cap",
+"ulker": "cap",
+"torku": "cap",
+"sutas": "cap",
+"valio": "cap",
+"lactalis": "cap",
+"hochland": "cap",
+"arla": "cap",
+"almette": "cap",
+"bonduelle": "cap",
+"calve": "cap",
+"cinnabon": "cap",
+"arby's": "cap",
+"chipotle": "cap",
+"sbarro": "cap",
+"nando's": "cap",
+"jollibee": "cap",
+"doubletree": "exact:DoubleTree",
+"conrad": "cap",
+"westin": "cap",
+"courtyard": "cap",
+"kempinski": "cap",
+"fairmont": "cap",
+"raffles": "cap",
+"sofitel": "cap",
+"pullman": "cap",
+"movenpick": "cap",
+"swissotel": "cap",
+"jumeirah": "cap",
+"rotana": "cap",
+"travelodge": "cap",
+"andaz": "cap",
+"aloft": "cap"
+},
+"phrases": [
+[
+"visa",
+"electron"
+],
+[
+"american",
+"express"
+],
+[
+"china",
+"unionpay"
+],
+[
+"diners",
+"club"
+],
+[
+"western",
+"union"
+],
+[
+"ria",
+"money",
+"transfer"
+],
+[
+"apple",
+"pay"
+],
+[
+"google",
+"pay"
+],
+[
+"samsung",
+"pay"
+],
+[
+"wechat",
+"pay"
+],
+[
+"tbc",
+"bank"
+],
+[
+"tenge",
+"bank"
+],
+[
+"ziraat",
+"bank"
+],
+[
+"j",
+"p",
+"morgan"
+],
+[
+"goldman",
+"sachs"
+],
+[
+"morgan",
+"stanley"
+],
+[
+"deutsche",
+"bank"
+],
+[
+"bnp",
+"paribas"
+],
+[
+"credit",
+"suisse"
+],
+[
+"wells",
+"fargo"
+],
+[
+"bank",
+"of",
+"america"
+],
+[
+"standard",
+"chartered"
+],
+[
+"emirates",
+"nbd"
+],
+[
+"al",
+"rajhi"
+],
+[
+"kaspi",
+"bank"
+],
+[
+"halyk",
+"bank"
+],
+[
+"dow",
+"jones"
+],
+[
+"visa",
+"inc"
+],
+[
+"mastercard",
+"inc"
+],
+[
+"uzbekistan",
+"airways"
+],
+[
+"air",
+"astana"
+],
+[
+"etihad",
+"airways"
+],
+[
+"qatar",
+"airways"
+],
+[
+"turkish",
+"airlines"
+],
+[
+"air",
+"france"
+],
+[
+"british",
+"airways"
+],
+[
+"ita",
+"airways"
+],
+[
+"austrian",
+"airlines"
+],
+[
+"wizz",
+"air"
+],
+[
+"american",
+"airlines"
+],
+[
+"delta",
+"air",
+"lines"
+],
+[
+"united",
+"airlines"
+],
+[
+"air",
+"canada"
+],
+[
+"singapore",
+"airlines"
+],
+[
+"cathay",
+"pacific"
+],
+[
+"korean",
+"air"
+],
+[
+"japan",
+"airlines"
+],
+[
+"china",
+"southern"
+],
+[
+"china",
+"eastern"
+],
+[
+"air",
+"china"
+],
+[
+"hainan",
+"airlines"
+],
+[
+"air",
+"india"
+],
+[
+"air",
+"arabia"
+],
+[
+"gulf",
+"air"
+],
+[
+"oman",
+"air"
+],
+[
+"kuwait",
+"airways"
+],
+[
+"royal",
+"jordanian"
+],
+[
+"ethiopian",
+"airlines"
+],
+[
+"kenya",
+"airlines"
+],
+[
+"azerbaijan",
+"airlines"
+],
+[
+"somon",
+"air"
+],
+[
+"air",
+"manas"
+],
+[
+"avia",
+"traffic"
+],
+[
+"centrum",
+"air"
+],
+[
+"silk",
+"avia"
+],
+[
+"mercedes",
+"benz"
+],
+[
+"alfa",
+"romeo"
+],
+[
+"rolls",
+"royce"
+],
+[
+"aston",
+"martin"
+],
+[
+"jaguar",
+"land",
+"rover"
+],
+[
+"land",
+"rover"
+],
+[
+"range",
+"rover"
+],
+[
+"great",
+"wall"
+],
+[
+"li",
+"auto"
+],
+[
+"golden",
+"dragon"
+],
+[
+"john",
+"deere"
+],
+[
+"harley",
+"davidson"
+],
+[
+"land",
+"cruiser"
+],
+[
+"santa",
+"fe"
+],
+[
+"x",
+"trail"
+],
+[
+"cr",
+"v"
+],
+[
+"model",
+"s"
+],
+[
+"model",
+"x"
+],
+[
+"model",
+"y"
+],
+[
+"atlas",
+"pro"
+],
+[
+"song",
+"plus"
+],
+[
+"han",
+"ev"
+],
+[
+"macbook",
+"air"
+],
+[
+"macbook",
+"pro"
+],
+[
+"mac",
+"mini"
+],
+[
+"apple",
+"watch"
+],
+[
+"apple",
+"tv"
+],
+[
+"app",
+"store"
+],
+[
+"google",
+"maps"
+],
+[
+"google",
+"drive"
+],
+[
+"google",
+"docs"
+],
+[
+"google",
+"translate"
+],
+[
+"google",
+"play"
+],
+[
+"play",
+"market"
+],
+[
+"youtube",
+"music"
+],
+[
+"hewlett",
+"packard"
+],
+[
+"premiere",
+"pro"
+],
+[
+"after",
+"effects"
+],
+[
+"unreal",
+"engine"
+],
+[
+"red",
+"hat"
+],
+[
+"prime",
+"video"
+],
+[
+"amazon",
+"prime"
+],
+[
+"epic",
+"games"
+],
+[
+"electronic",
+"arts"
+],
+[
+"counter",
+"strike"
+],
+[
+"call",
+"of",
+"duty"
+],
+[
+"tesla",
+"motors"
+],
+[
+"uzum",
+"market"
+],
+[
+"uzum",
+"bank"
+],
+[
+"uzum",
+"nasiya"
+],
+[
+"booking",
+"com"
+],
+[
+"khan",
+"academy"
+],
+[
+"google",
+"meet"
+],
+[
+"opera",
+"mini"
+],
+[
+"uc",
+"browser"
+],
+[
+"at",
+"t"
+],
+[
+"t",
+"mobile"
+],
+[
+"under",
+"armour"
+],
+[
+"new",
+"balance"
+],
+[
+"the",
+"north",
+"face"
+],
+[
+"north",
+"face"
+],
+[
+"lee",
+"cooper"
+],
+[
+"calvin",
+"klein"
+],
+[
+"tommy",
+"hilfiger"
+],
+[
+"ralph",
+"lauren"
+],
+[
+"polo",
+"ralph",
+"lauren"
+],
+[
+"hugo",
+"boss"
+],
+[
+"giorgio",
+"armani"
+],
+[
+"emporio",
+"armani"
+],
+[
+"louis",
+"vuitton"
+],
+[
+"christian",
+"dior"
+],
+[
+"dolce",
+"gabbana"
+],
+[
+"yves",
+"saint",
+"laurent"
+],
+[
+"saint",
+"laurent"
+],
+[
+"patek",
+"philippe"
+],
+[
+"audemars",
+"piguet"
+],
+[
+"tag",
+"heuer"
+],
+[
+"ray",
+"ban"
+],
+[
+"pull",
+"bear"
+],
+[
+"massimo",
+"dutti"
+],
+[
+"lc",
+"waikiki"
+],
+[
+"oral",
+"b"
+],
+[
+"head",
+"shoulders"
+],
+[
+"estee",
+"lauder"
+],
+[
+"the",
+"body",
+"shop"
+],
+[
+"la",
+"roche",
+"posay"
+],
+[
+"johnson",
+"johnson"
+],
+[
+"procter",
+"gamble"
+],
+[
+"coca",
+"cola"
+],
+[
+"dr",
+"pepper"
+],
+[
+"red",
+"bull"
+],
+[
+"costa",
+"coffee"
+],
+[
+"tim",
+"hortons"
+],
+[
+"mars",
+"inc"
+],
+[
+"kit",
+"kat"
+],
+[
+"alpen",
+"gold"
+],
+[
+"chupa",
+"chups"
+],
+[
+"ritter",
+"sport"
+],
+[
+"burger",
+"king"
+],
+[
+"pizza",
+"hut"
+],
+[
+"papa",
+"john's"
+],
+[
+"taco",
+"bell"
+],
+[
+"chick",
+"fil",
+"a"
+],
+[
+"shake",
+"shack"
+],
+[
+"five",
+"guys"
+],
+[
+"feed",
+"up"
+],
+[
+"les",
+"ailes"
+],
+[
+"radisson",
+"blu"
+],
+[
+"ritz",
+"carlton"
+],
+[
+"four",
+"seasons"
+],
+[
+"holiday",
+"inn"
+],
+[
+"best",
+"western"
+],
+[
+"hilton",
+"garden",
+"inn"
+],
+[
+"samsung",
+"electronics"
+],
+[
+"bbc",
+"news"
+],
+[
+"al",
+"jazeera"
+],
+[
+"sky",
+"news"
+],
+[
+"fox",
+"news"
+],
+[
+"abc",
+"news"
+],
+[
+"associated",
+"press"
+],
+[
+"the",
+"economist"
+],
+[
+"financial",
+"times"
+],
+[
+"the",
+"guardian"
+],
+[
+"the",
+"new",
+"york",
+"times"
+],
+[
+"new",
+"york",
+"times"
+],
+[
+"the",
+"washington",
+"post"
+],
+[
+"washington",
+"post"
+],
+[
+"the",
+"times"
+],
+[
+"daily",
+"mail"
+],
+[
+"national",
+"geographic"
+],
+[
+"discovery",
+"channel"
+],
+[
+"animal",
+"planet"
+],
+[
+"kun",
+"uz"
+],
+[
+"daryo",
+"uz"
+],
+[
+"gazeta",
+"uz"
+],
+[
+"podrobno",
+"uz"
+],
+[
+"uza",
+"uz"
+],
+[
+"euronews",
+"uzbek"
+],
+[
+"amazon",
+"web",
+"services"
+],
+[
+"tesla",
+"inc"
+],
+[
+"walt",
+"disney"
+],
+[
+"warner",
+"bros"
+],
+[
+"dc",
+"comics"
+],
+[
+"hello",
+"kitty"
+],
+[
+"saudi",
+"aramco"
+],
+[
+"siemens",
+"energy"
+],
+[
+"general",
+"electric"
+],
+[
+"emirates",
+"skycargo"
+],
+[
+"visa",
+"card"
+],
+[
+"master",
+"card"
+],
+[
+"grand",
+"cherokee"
+],
+[
+"continental",
+"gt"
+],
+[
+"echo",
+"dot"
+],
+[
+"fire",
+"tv"
+],
+[
+"mi",
+"band"
+],
+[
+"huawei",
+"mate"
+],
+[
+"honor",
+"magic"
+],
+[
+"galaxy",
+"note"
+],
+[
+"galaxy",
+"tab"
+],
+[
+"galaxy",
+"watch"
+],
+[
+"galaxy",
+"buds"
+],
+[
+"vision",
+"pro"
+],
+[
+"final",
+"cut",
+"pro"
+],
+[
+"harman",
+"kardon"
+],
+[
+"bang",
+"olufsen"
+],
+[
+"xbox",
+"series"
+],
+[
+"nintendo",
+"switch"
+],
+[
+"konica",
+"minolta"
+],
+[
+"western",
+"digital"
+],
+[
+"tp",
+"link"
+],
+[
+"d",
+"link"
+],
+[
+"huawei",
+"cloud"
+],
+[
+"node",
+"js"
+],
+[
+"vue",
+"js"
+],
+[
+"spring",
+"boot"
+],
+[
+"visual",
+"studio"
+],
+[
+"vs",
+"code"
+],
+[
+"intellij",
+"idea"
+],
+[
+"android",
+"studio"
+],
+[
+"google",
+"cloud"
+],
+[
+"power",
+"bi"
+],
+[
+"hugging",
+"face"
+],
+[
+"stack",
+"overflow"
+],
+[
+"google",
+"classroom"
+],
+[
+"mail",
+"ru"
+],
+[
+"jd",
+"com"
+],
+[
+"line",
+"pay"
+],
+[
+"clash",
+"of",
+"clans"
+],
+[
+"clash",
+"royale"
+],
+[
+"brawl",
+"stars"
+],
+[
+"pubg",
+"mobile"
+],
+[
+"free",
+"fire"
+],
+[
+"genshin",
+"impact"
+],
+[
+"among",
+"us"
+],
+[
+"candy",
+"crush"
+],
+[
+"subway",
+"surfers"
+],
+[
+"angry",
+"birds"
+],
+[
+"pac",
+"man"
+],
+[
+"super",
+"mario"
+],
+[
+"pokemon",
+"go"
+],
+[
+"league",
+"of",
+"legends"
+],
+[
+"world",
+"of",
+"warcraft"
+],
+[
+"apex",
+"legends"
+],
+[
+"assassin's",
+"creed"
+],
+[
+"far",
+"cry"
+],
+[
+"need",
+"for",
+"speed"
+],
+[
+"mortal",
+"kombat"
+],
+[
+"street",
+"fighter"
+],
+[
+"the",
+"witcher"
+],
+[
+"elden",
+"ring"
+],
+[
+"dark",
+"souls"
+],
+[
+"gears",
+"of",
+"war"
+],
+[
+"gran",
+"turismo"
+],
+[
+"the",
+"sims"
+],
+[
+"rocket",
+"league"
+],
+[
+"fall",
+"guys"
+],
+[
+"mobile",
+"legends"
+],
+[
+"clash",
+"mini"
+],
+[
+"hamster",
+"kombat"
+],
+[
+"lot",
+"polish",
+"airlines"
+],
+[
+"tap",
+"air",
+"portugal"
+],
+[
+"aer",
+"lingus"
+],
+[
+"brussels",
+"airlines"
+],
+[
+"air",
+"serbia"
+],
+[
+"croatia",
+"airlines"
+],
+[
+"bulgaria",
+"air"
+],
+[
+"air",
+"moldova"
+],
+[
+"georgian",
+"airways"
+],
+[
+"buta",
+"airways"
+],
+[
+"iran",
+"air"
+],
+[
+"mahan",
+"air"
+],
+[
+"pakistan",
+"international",
+"airlines"
+],
+[
+"srilankan",
+"airlines"
+],
+[
+"thai",
+"airways"
+],
+[
+"vietnam",
+"airlines"
+],
+[
+"malaysia",
+"airlines"
+],
+[
+"garuda",
+"indonesia"
+],
+[
+"philippine",
+"airlines"
+],
+[
+"cebu",
+"pacific"
+],
+[
+"eva",
+"air"
+],
+[
+"china",
+"airlines"
+],
+[
+"air",
+"busan"
+],
+[
+"jeju",
+"air"
+],
+[
+"air",
+"new",
+"zealand"
+],
+[
+"virgin",
+"atlantic"
+],
+[
+"virgin",
+"australia"
+],
+[
+"copa",
+"airlines"
+],
+[
+"air",
+"europa"
+],
+[
+"royal",
+"air",
+"maroc"
+],
+[
+"air",
+"algerie"
+],
+[
+"kenya",
+"airways"
+],
+[
+"south",
+"african",
+"airways"
+],
+[
+"middle",
+"east",
+"airlines"
+],
+[
+"jazeera",
+"airways"
+],
+[
+"nile",
+"air"
+],
+[
+"air",
+"cairo"
+],
+[
+"fly",
+"baghdad"
+],
+[
+"bank",
+"of",
+"china"
+],
+[
+"china",
+"construction",
+"bank"
+],
+[
+"credit",
+"agricole"
+],
+[
+"societe",
+"generale"
+],
+[
+"intesa",
+"sanpaolo"
+],
+[
+"abn",
+"amro"
+],
+[
+"danske",
+"bank"
+],
+[
+"otp",
+"bank"
+],
+[
+"garanti",
+"bbva"
+],
+[
+"yapi",
+"kredi"
+],
+[
+"emirates",
+"islamic"
+],
+[
+"dubai",
+"islamic",
+"bank"
+],
+[
+"abu",
+"dhabi",
+"islamic",
+"bank"
+],
+[
+"kuwait",
+"finance",
+"house"
+],
+[
+"islamic",
+"development",
+"bank"
+],
+[
+"asian",
+"development",
+"bank"
+],
+[
+"world",
+"bank"
+],
+[
+"charles",
+"schwab"
+],
+[
+"interactive",
+"brokers"
+],
+[
+"apple",
+"card"
+],
+[
+"google",
+"wallet"
+],
+[
+"kaspi",
+"gold"
+],
+[
+"freedom",
+"finance"
+],
+[
+"cash",
+"app"
+],
+[
+"gate",
+"io"
+],
+[
+"trust",
+"wallet"
+],
+[
+"shiba",
+"inu"
+],
+[
+"the",
+"ordinary"
+],
+[
+"tom",
+"ford"
+],
+[
+"jo",
+"malone"
+],
+[
+"al",
+"haramain"
+],
+[
+"arabian",
+"oud"
+],
+[
+"swiss",
+"arabian"
+],
+[
+"paco",
+"rabanne"
+],
+[
+"carolina",
+"herrera"
+],
+[
+"yves",
+"rocher"
+],
+[
+"max",
+"factor"
+],
+[
+"huda",
+"beauty"
+],
+[
+"fenty",
+"beauty"
+],
+[
+"too",
+"faced"
+],
+[
+"urban",
+"decay"
+],
+[
+"anastasia",
+"beverly",
+"hills"
+],
+[
+"charlotte",
+"tilbury"
+],
+[
+"rare",
+"beauty"
+],
+[
+"gliss",
+"kur"
+],
+[
+"old",
+"spice"
+],
+[
+"hugo",
+"boss",
+"bottled"
+],
+[
+"narciso",
+"rodriguez"
+],
+[
+"jean",
+"paul",
+"gaultier"
+],
+[
+"g",
+"shock"
+],
+[
+"daniel",
+"wellington"
+],
+[
+"michael",
+"kors"
+],
+[
+"kate",
+"spade"
+],
+[
+"united",
+"colors",
+"of",
+"benetton"
+],
+[
+"marks",
+"spencer"
+],
+[
+"river",
+"island"
+],
+[
+"off",
+"white"
+],
+[
+"stone",
+"island"
+],
+[
+"canada",
+"goose"
+],
+[
+"dr",
+"martens"
+],
+[
+"hush",
+"puppies"
+],
+[
+"armani",
+"exchange"
+],
+[
+"max",
+"mara"
+],
+[
+"bottega",
+"veneta"
+],
+[
+"miu",
+"miu"
+],
+[
+"jimmy",
+"choo"
+],
+[
+"christian",
+"louboutin"
+],
+[
+"manolo",
+"blahnik"
+],
+[
+"victoria's",
+"secret"
+],
+[
+"air",
+"jordan"
+],
+[
+"air",
+"max"
+],
+[
+"air",
+"force"
+],
+[
+"adidas",
+"originals"
+],
+[
+"stan",
+"smith"
+],
+[
+"maxwell",
+"house"
+],
+[
+"ahmad",
+"tea"
+],
+[
+"brooke",
+"bond"
+],
+[
+"fuse",
+"tea"
+],
+[
+"san",
+"pellegrino"
+],
+[
+"pure",
+"life"
+],
+[
+"minute",
+"maid"
+],
+[
+"del",
+"monte"
+],
+[
+"corn",
+"flakes"
+],
+[
+"nature",
+"valley"
+],
+[
+"m",
+"m's"
+],
+[
+"tic",
+"tac"
+],
+[
+"hubba",
+"bubba"
+],
+[
+"kinder",
+"surprise"
+],
+[
+"choco",
+"pie"
+],
+[
+"shin",
+"ramyun"
+],
+[
+"uncle",
+"ben's"
+],
+[
+"gallina",
+"blanca"
+],
+[
+"carl's",
+"jr"
+],
+[
+"dairy",
+"queen"
+],
+[
+"baskin",
+"robbins"
+],
+[
+"krispy",
+"kreme"
+],
+[
+"panda",
+"express"
+],
+[
+"little",
+"caesars"
+],
+[
+"texas",
+"chicken"
+],
+[
+"black",
+"star",
+"burger"
+],
+[
+"waldorf",
+"astoria"
+],
+[
+"st",
+"regis"
+],
+[
+"jw",
+"marriott"
+],
+[
+"le",
+"meridien"
+],
+[
+"mandarin",
+"oriental"
+],
+[
+"shangri",
+"la"
+],
+[
+"burj",
+"al",
+"arab"
+],
+[
+"crowne",
+"plaza"
+],
+[
+"hampton",
+"inn"
+],
+[
+"embassy",
+"suites"
+],
+[
+"days",
+"inn"
+],
+[
+"premier",
+"inn"
+],
+[
+"hyatt",
+"regency"
+],
+[
+"park",
+"hyatt"
+]
+]
+}
