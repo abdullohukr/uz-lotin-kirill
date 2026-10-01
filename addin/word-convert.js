@@ -8,8 +8,11 @@
  * Cyrillic as East Asian text in documents whose East Asian language is
  * Japanese/Chinese and draws it with a wide Japanese font.
  *
+ * A partly selected paragraph goes the same way: only words inside the
+ * selection change.
+ *
  * Fallback path (paragraphs with footnote marks, fields, pictures, tracked
- * changes, or only partly selected): word ranges are replaced one by one.
+ * changes): word ranges are replaced one by one.
  */
 /* global Word, UzTranslit, UzOoxml */
 (function (root) {
@@ -103,8 +106,9 @@
     var wordFn = stats.script === "cyr" ? t.wordToLatin : t.wordToCyrillic;
 
     // 1. which paragraphs are completely inside the selection (all of them without one)
+    var WHOLE = { Inside: 1, InsideStart: 1, InsideEnd: 1, Equal: 1 };
     var info = paras.map(function (p) {
-      var o = { p: p, whole: true, part: null, cmp: null };
+      var o = { p: p, whole: true, part: null, cmp: null, window: null };
       if (limitTo) {
         o.cmp = p.getRange("Content").compareLocationWith(limitTo);
         o.part = p.getRange("Content").intersectWithOrNullObject(limitTo);
@@ -114,22 +118,36 @@
     });
     if (limitTo) {
       await ctx.sync();
-      info.forEach(function (o) { o.whole = o.cmp.value === "Inside" || o.cmp.value === "Equal"; });
+      info.forEach(function (o) { o.whole = !!WHOLE[o.cmp.value]; });
+      // partly selected paragraph: offsets of the selected part in the paragraph text
+      info.forEach(function (o) {
+        if (o.whole || o.part.isNullObject) return;
+        o.pre = o.p.getRange("Start").expandTo(o.part.getRange("Start"));
+        o.pre.load("text");
+        o.part.load("text");
+      });
+      await ctx.sync();
+      info.forEach(function (o) {
+        if (o.whole || o.part.isNullObject) return;
+        var from = o.pre.text.length;
+        o.window = [from, from + o.part.text.length];
+      });
     }
 
-    // 2. read OOXML of whole paragraphs
-    info.forEach(function (o) { if (o.whole) o.ox = o.p.getOoxml(); });
+    // 2. read OOXML of the paragraphs
+    info.forEach(function (o) { if (o.whole || o.window) o.ox = o.p.getOoxml(); });
     await ctx.sync();
 
-    // 3. convert; write back whole paragraphs, collect the rest for the fallback
+    // 3. convert; write paragraphs back, collect the rest for the fallback
     var fallback = [];
     info.forEach(function (o) {
-      if (!o.whole) {
-        if (o.part && !o.part.isNullObject) fallback.push(o.part);
+      if (!o.ox) return;
+      var res = UzOoxml.convertPackage(o.ox.value, wordFn, stats.script, UzTranslit.wordRegex, o.window);
+      if (res.risky) {
+        fallback.push(o.window ? o.part : o.p.getRange("Content"));
+        stats.fallbackParas++;
         return;
       }
-      var res = UzOoxml.convertPackage(o.ox.value, wordFn, stats.script, UzTranslit.wordRegex);
-      if (res.risky) { fallback.push(o.p.getRange("Content")); stats.fallbackParas++; return; }
       if (res.changed) {
         o.p.insertOoxml(res.xml, "Replace");
         stats.words += res.words;

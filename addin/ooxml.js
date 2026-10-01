@@ -11,10 +11,11 @@
 (function (root) {
   "use strict";
 
-  // Anything between two <w:t> that is not just a run boundary ends a word.
-  var BREAKS = /<w:(tab|br|cr|p[ >]|ptab|sym|noBreakHyphen|softHyphen|footnoteReference|endnoteReference|commentReference|fldChar|instrText|drawing|pict|object)\b/;
+  // Elements that stand for one character in Word's paragraph text (tab, line break...).
+  // They end a word, and they keep offsets equal to Range.text offsets.
+  var ONE_CHAR = /<w:(tab|br|cr|ptab|sym|noBreakHyphen|softHyphen)\b/g;
   // Paragraphs we do not rewrite (their content would be re-created on insert).
-  var RISKY = /<w:(footnoteReference|endnoteReference|commentReference|fldChar|fldSimple|drawing|pict|object|sdt|ins|del|moveFrom|moveTo|bookmarkStart)\b/;
+  var RISKY = /<w:(footnoteReference|endnoteReference|commentReference|fldChar|fldSimple|drawing|pict|object|sdt|ins|del|moveFrom|moveTo)\b/;
   var WT = /<w:t(\s[^>]*)?>([^<]*)<\/w:t>/g;
   var RUN = /<w:r(?:\s[^>]*)?>[\s\S]*?<\/w:r>/g;
   var MARK = " uzlk-changed=\"1\"";
@@ -41,9 +42,11 @@
 
   /*
    * pkg: OOXML string. convertWord(word) -> converted word. script: "lat" | "cyr"
-   * (the script of the SOURCE words). Returns { xml, changed, risky }.
+   * (the script of the SOURCE words). window: optional [from, to] in paragraph
+   * text offsets (as Range.text counts them) - only words fully inside change.
+   * Returns { xml, changed, words, risky }.
    */
-  function convertPackage(pkg, convertWord, script, wordRegex) {
+  function convertPackage(pkg, convertWord, script, wordRegex, window) {
     var bb = bodyBounds(pkg);
     if (!bb) return { xml: pkg, changed: 0, risky: true };
     var body = pkg.slice(bb[0], bb[1]);
@@ -54,7 +57,8 @@
     WT.lastIndex = 0;
     while ((m = WT.exec(body))) {
       var gap = body.slice(lastEnd, m.index);
-      if (nodes.length && BREAKS.test(gap)) joined += "\u0000";
+      var ones = (gap.replace(/<w:pPr>[\s\S]*?<\/w:pPr>/g, "").match(ONE_CHAR) || []).length;
+      for (var g = 0; g < ones; g++) joined += "\u0000";
       var text = unesc(m[2]);
       nodes.push({ start: m.index, end: m.index + m[0].length, attrs: m[1] || "", text: text, pos: joined.length, out: null });
       joined += text;
@@ -68,6 +72,7 @@
     var urls = root.UzTranslit.urlSpans(joined);
     while ((m = re.exec(joined))) {
       if (urls.length && root.UzTranslit.inSpans(urls, m.index, m.index + m[0].length)) continue;
+      if (window && (m.index < window[0] || m.index + m[0].length > window[1])) continue;
       var out = convertWord(m[0]);
       if (out !== m[0]) edits.push([m.index, m.index + m[0].length, out]);
     }
