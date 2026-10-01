@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>6b0f7c2e-3d1a-4c5e-9a8b-2f4d6e8a1c37</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Shaxsiy</ProviderName>
+  <DefaultLocale>uz-UZ</DefaultLocale>
+  <DisplayName DefaultValue="Lotin ⇄ Kirill"/>
+  <Description DefaultValue="O‘zbek matnini lotin va kirill yozuvlari orasida o‘giradi. Qo‘shtirnoqlar va formatlash o‘zgarmaydi."/>
+  <IconUrl DefaultValue="__BASE__/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="__BASE__/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="__BASE__/taskpane.html"/>
+  <AppDomains>
+    <AppDomain>__ORIGIN__</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <Requirements>
+    <Sets DefaultMinVersion="1.3">
+      <Set Name="WordApi" MinVersion="1.3"/>
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="__BASE__/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="UzLK.Tab">
+              <Group id="UzLK.Group">
+                <Label resid="Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="UzLK.ToCyr">
+                  <Label resid="ToCyr.Label"/>
+                  <Supertip>
+                    <Title resid="ToCyr.Label"/>
+                    <Description resid="ToCyr.Tip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Cyr.16"/>
+                    <bt:Image size="32" resid="Cyr.32"/>
+                    <bt:Image size="80" resid="Cyr.80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>uzToCyrillic</FunctionName>
+                  </Action>
+                </Control>
+                <Control xsi:type="Button" id="UzLK.ToLat">
+                  <Label resid="ToLat.Label"/>
+                  <Supertip>
+                    <Title resid="ToLat.Label"/>
+                    <Description resid="ToLat.Tip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Lat.16"/>
+                    <bt:Image size="32" resid="Lat.32"/>
+                    <bt:Image size="80" resid="Lat.80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>uzToLatin</FunctionName>
+                  </Action>
+                </Control>
+                <Control xsi:type="Button" id="UzLK.Pane">
+                  <Label resid="Pane.Label"/>
+                  <Supertip>
+                    <Title resid="Pane.Label"/>
+                    <Description resid="Pane.Tip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>UzLK.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+              <Label resid="Tab.Label"/>
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="__BASE__/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="__BASE__/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="__BASE__/assets/icon-80.png"/>
+        <bt:Image id="Cyr.16" DefaultValue="__BASE__/assets/cyr-16.png"/>
+        <bt:Image id="Cyr.32" DefaultValue="__BASE__/assets/cyr-32.png"/>
+        <bt:Image id="Cyr.80" DefaultValue="__BASE__/assets/cyr-80.png"/>
+        <bt:Image id="Lat.16" DefaultValue="__BASE__/assets/lat-16.png"/>
+        <bt:Image id="Lat.32" DefaultValue="__BASE__/assets/lat-32.png"/>
+        <bt:Image id="Lat.80" DefaultValue="__BASE__/assets/lat-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="__BASE__/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="__BASE__/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Tab.Label" DefaultValue="Lotin-Kirill"/>
+        <bt:String id="Group.Label" DefaultValue="Yozuv"/>
+        <bt:String id="ToCyr.Label" DefaultValue="Kirillga"/>
+        <bt:String id="ToLat.Label" DefaultValue="Lotinga"/>
+        <bt:String id="Pane.Label" DefaultValue="Panel"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="ToCyr.Tip" DefaultValue="Belgilangan matnni (bo‘lmasa butun hujjatni) kirill yozuviga o‘giradi. Qo‘shtirnoqlar o‘zgarmaydi."/>
+        <bt:String id="ToLat.Tip" DefaultValue="Belgilangan matnni (bo‘lmasa butun hujjatni) lotin yozuviga o‘giradi. Qo‘shtirnoqlar o‘zgarmaydi."/>
+        <bt:String id="Pane.Tip" DefaultValue="Sozlamalar, shaxsiy lug‘at va sinov oynasi."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

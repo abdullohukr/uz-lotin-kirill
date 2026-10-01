@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lotin ⇄ Kirill</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="engine.js"></script>
+  <script src="exceptions.js"></script>
+  <script src="settings.js"></script>
+  <script src="word-convert.js"></script>
+  <link rel="stylesheet" href="taskpane.css">
+</head>
+<body>
+  <header>
+    <h1>Lotin ⇄ Kirill</h1>
+    <p class="sub">Qo‘shtirnoqlar « » “ ” " hech qachon o‘zgartirilmaydi.</p>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <button id="toCyr" class="primary">Kirillga o‘girish</button>
+      <button id="toLat" class="primary">Lotinga o‘girish</button>
+    </div>
+    <fieldset class="scope">
+      <label><input type="radio" name="scope" value="auto" checked> Belgilangan matn, bo‘lmasa butun hujjat</label>
+      <label><input type="radio" name="scope" value="selection"> Faqat belgilangan matn</label>
+      <label><input type="radio" name="scope" value="document"> Butun hujjat (izohlar, kolontitullar bilan)</label>
+    </fieldset>
+    <div id="progress" hidden><div id="bar"></div></div>
+    <p id="status" role="status"></p>
+  </section>
+
+  <section class="card">
+    <h2>Tez sinab ko‘rish</h2>
+    <textarea id="tryIn" rows="3" placeholder="Matn yozing yoki qo‘ying…"></textarea>
+    <div class="row">
+      <button id="tryCyr">→ Kirill</button>
+      <button id="tryLat">→ Lotin</button>
+    </div>
+    <textarea id="tryOut" rows="3" readonly></textarea>
+  </section>
+
+  <section class="card">
+    <h2>Sozlamalar</h2>
+    <label class="field">Tutuq va o‘ belgisi (lotinda)
+      <select id="style">
+        <option value="typographic">o‘ g‘ ma’no  (‘ ’)</option>
+        <option value="unicode">oʻ gʻ maʼno  (ʻ ʼ, rasmiy)</option>
+        <option value="plain">o' g' ma'no  (')</option>
+      </select>
+    </label>
+    <label class="field">Mening lug‘atim — har qatorda <code>lotin = кирилл</code>
+      <textarea id="pairs" rows="5" placeholder="Hiraql = Ҳирақл&#10;Rasululloh = Расулуллоҳ"></textarea>
+    </label>
+    <label class="field">O‘girilmaydigan so‘zlar — har qatorda bittadan
+      <textarea id="skip" rows="3" placeholder="iPhone&#10;Excel"></textarea>
+    </label>
+    <button id="save">Saqlash</button>
+    <span id="saved" class="muted"></span>
+  </section>
+
+  <footer class="muted">Hujjatni o‘girishdan oldin saqlab qo‘ying. Bekor qilish: ⌘Z / Ctrl+Z.</footer>
+  <script src="taskpane.js"></script>
+</body>
+</html>
