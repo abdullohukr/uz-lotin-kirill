@@ -136,7 +136,7 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                          ByRef nWords As Long, ByRef nSkipped As Long)
     Dim para As Paragraph, pr As Range, r As Range, t As String
     Dim starts() As Long, lens() As Long, cnt As Long, k As Long
-    Dim tok As String, outS As String, a As Long, b As Long, np As Long
+    Dim tok As String, outS As String, a As Long, b As Long, np As Long, fn As String
     For Each para In rng.Paragraphs
         Set pr = para.Range
         t = pr.Text
@@ -152,7 +152,16 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                         Set r = pr.Duplicate
                         r.SetRange a, b
                         If StrComp(r.Text, tok, vbBinaryCompare) = 0 Then
+                            fn = r.Font.Name
                             r.Text = outS
+                            ' Word may draw inserted Cyrillic with the East Asian font
+                            ' (documents whose East Asian language is Japanese/Chinese):
+                            ' give the word its own font in every slot.
+                            If Len(fn) > 0 Then
+                                r.SetRange a, a + Len(outS)
+                                If r.Font.NameFarEast <> fn Then r.Font.NameFarEast = fn
+                                If r.Font.NameOther <> fn Then r.Font.NameOther = fn
+                            End If
                             nWords = nWords + 1
                         Else
                             nSkipped = nSkipped + 1

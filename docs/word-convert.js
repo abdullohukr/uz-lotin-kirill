@@ -17,6 +17,16 @@
   var OBJECT_CHARS = /[\u0000-\u0008\u000B-\u001F￼]/;
   var WORD_RE = /[A-Za-zЀ-ӿ'`´‘’ʻʼ]+/g;
 
+  // Word may draw inserted Cyrillic with the East Asian font when the document's
+  // East Asian language is Japanese/Chinese (wide, serif letters). Give the new
+  // text the word's own font in the East Asian slot too.
+  var HAS_FAR_EAST = false;
+  function fixFont(range, fontName) {
+    if (!fontName) return;
+    if (HAS_FAR_EAST) range.font.nameFarEast = fontName;
+    else range.font.name = fontName;
+  }
+
   function makeEngine(settings) {
     var t = UzTranslit.create(root.UZ_EXCEPTIONS || {}, {
       okina: settings.okina,
@@ -67,7 +77,7 @@
     groups.forEach(function (r) {
       if (limitTo && r.isNullObject) return;
       var s = r.split(DELIMS, false, true, false);
-      s.load("items/text");
+      s.load("items/text,items/font/name");
       splits.push({ r: r, s: s });
     });
     await ctx.sync();
@@ -81,7 +91,8 @@
         var out = convert(text);
         if (out === text) return;
         if (!OBJECT_CHARS.test(text)) {
-          wr.insertText(out, "Replace");
+          var fontName = wr.font.name;
+          fixFont(wr.insertText(out, "Replace"), fontName);
           stats.words++;
           return;
         }
@@ -94,7 +105,7 @@
           if (o === w || seen[w]) continue;
           seen[w] = true;
           var found = wr.search(w, { matchCase: true });
-          found.load("items");
+          found.load("items/font/name");
           searches.push({ found: found, out: o });
         }
       });
@@ -102,7 +113,11 @@
     if (searches.length) {
       await ctx.sync();
       searches.forEach(function (s) {
-        s.found.items.forEach(function (r) { r.insertText(s.out, "Replace"); stats.words++; });
+        s.found.items.forEach(function (r) {
+          var fontName = r.font.name;
+          fixFont(r.insertText(s.out, "Replace"), fontName);
+          stats.words++;
+        });
       });
     }
     await ctx.sync();
@@ -115,6 +130,10 @@
    */
   async function convertInWord(direction, scope, settings, onProgress) {
     var t = makeEngine(settings);
+    try {
+      HAS_FAR_EAST = !!(Office.context.requirements &&
+        Office.context.requirements.isSetSupported("WordApiDesktop", "1.3"));
+    } catch (e) { HAS_FAR_EAST = false; }
     var convert = direction === "lat" ? t.toLatin : t.toCyrillic;
     var stats = { words: 0, paragraphs: 0, scope: "document" };
 
