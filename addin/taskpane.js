@@ -38,8 +38,10 @@
         status("O‘giryapmiz… " + done + " / " + total + " xatboshi");
       });
       var sec = Math.round((Date.now() - started) / 1000);
-      status("Tayyor: " + st.words + " ta so‘z o‘girildi (" +
-        (st.scope === "selection" ? "belgilangan matn" : "butun hujjat") + ", " + sec + " s).");
+      var msg = "Tayyor: " + st.words + " ta so‘z o‘girildi (" +
+        (st.scope === "selection" ? "belgilangan matn" : "butun hujjat") + ", " + sec + " s).";
+      if (st.extraParas) msg += " DIQQAT: hujjatda " + st.extraParas + " ta ortiqcha xatboshi paydo bo‘ldi — skrinshot yuboring.";
+      status(msg + " [ooxml " + st.ooxmlParas + ", oddiy " + st.fallbackParas + "]", !!st.extraParas);
     } catch (e) {
       status("Xato: " + (e && e.message ? e.message : e), true);
     } finally {

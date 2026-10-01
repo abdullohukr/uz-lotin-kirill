@@ -46,6 +46,7 @@ both.forEach(function (p) {
 });
 
 // one direction only
+eq("urls stay", t.toCyrillic("Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"), "Линк: https://islamqa.info/ar/answers/332928 ва www.savodxon.uz, ism.familiya@example.com ёзинг");
 eq("savodxon stems", t.toCyrillic("avtomobil avtomobilga albumin aksept"), "автомобиль автомобилга альбумин акцепт");
 eq("uzbek words keep no ь", t.toCyrillic("tush tol mil"), "туш тол мил");
 eq("passport surnames", t.toCyrillic("Abdullaev Tillaeva Boboevich"), "Абдуллаев Тиллаева Бобоевич");

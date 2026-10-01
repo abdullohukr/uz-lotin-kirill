@@ -136,13 +136,15 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                          ByRef nWords As Long, ByRef nSkipped As Long)
     Dim para As Paragraph, pr As Range, r As Range, t As String
     Dim starts() As Long, lens() As Long, cnt As Long, k As Long
-    Dim tok As String, outS As String, a As Long, b As Long, np As Long, fn As String
+    Dim tok As String, outS As String, a As Long, b As Long, np As Long, mask As String
     For Each para In rng.Paragraphs
         Set pr = para.Range
         t = pr.Text
         If HasSource(t, toLat) Then
             cnt = Tokenize(t, toLat, starts, lens)
+            mask = UrlMask(t)
             For k = cnt To 1 Step -1
+                If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) > 0 Then GoTo NextTok
                 tok = Mid$(t, starts(k), lens(k))
                 If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
                 If StrComp(outS, tok, vbBinaryCompare) <> 0 Then
@@ -152,22 +154,20 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                         Set r = pr.Duplicate
                         r.SetRange a, b
                         If StrComp(r.Text, tok, vbBinaryCompare) = 0 Then
-                            fn = r.Font.Name
-                            r.Text = outS
-                            ' Word may draw inserted Cyrillic with the East Asian font
-                            ' (documents whose East Asian language is Japanese/Chinese):
-                            ' give the word its own font in every slot.
-                            If Len(fn) > 0 Then
-                                r.SetRange a, a + Len(outS)
-                                If r.Font.NameFarEast <> fn Then r.Font.NameFarEast = fn
-                                If r.Font.NameOther <> fn Then r.Font.NameOther = fn
+                            ' Replace through Find: assigning r.Text makes Word mark new
+                            ' Cyrillic as East Asian (wide Japanese/Chinese font) in
+                            ' documents whose East Asian language is set; Find/Replace does not.
+                            If ReplaceInRange(r, tok, outS) Then
+                                nWords = nWords + 1
+                            Else
+                                nSkipped = nSkipped + 1
                             End If
-                            nWords = nWords + 1
                         Else
                             nSkipped = nSkipped + 1
                         End If
                     End If
                 End If
+NextTok:
             Next k
         End If
         np = np + 1
@@ -179,6 +179,66 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
         End If
     Next para
 End Sub
+
+Private Function ReplaceInRange(ByVal r As Range, ByVal findS As String, ByVal repl As String) As Boolean
+    With r.Find
+        .ClearFormatting
+        .Replacement.ClearFormatting
+        .Text = findS
+        .Replacement.Text = repl
+        .Forward = True
+        .Wrap = wdFindStop
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+        ReplaceInRange = .Execute(Replace:=wdReplaceOne)
+    End With
+End Function
+
+' "1" for every character that belongs to a link (http://, https://, www.) or an e-mail.
+Private Function UrlMask(ByVal t As String) As String
+    Dim m As String, i As Long, j As Long, L As Long, low As String, ch As String
+    L = Len(t)
+    m = String$(L, "0")
+    low = LCase$(t)
+    i = 1
+    Do While i <= L
+        If Mid$(low, i, 7) = "http://" Or Mid$(low, i, 8) = "https://" Or Mid$(low, i, 6) = "ftp://" Or Mid$(low, i, 4) = "www." Then
+            j = i
+            Do While j <= L
+                ch = Mid$(t, j, 1)
+                If ch = " " Or ch = vbCr Or ch = vbTab Or ch = vbLf Or ch = "<" Or ch = ">" Or ch = """" Or _
+                   AscW(ch) = &HAB Or AscW(ch) = &HBB Or AscW(ch) = &H201C Or AscW(ch) = &H201D Or AscW(ch) = &HA0 Then Exit Do
+                j = j + 1
+            Loop
+            Mid$(m, i, j - i) = String$(j - i, "1")
+            i = j
+        ElseIf Mid$(t, i, 1) = "@" Then
+            j = i
+            Do While j > 1
+                If Not IsMailCh(Mid$(t, j - 1, 1)) Then Exit Do
+                j = j - 1
+            Loop
+            Do While i < L
+                If Not IsMailCh(Mid$(t, i + 1, 1)) Then Exit Do
+                i = i + 1
+            Loop
+            Mid$(m, j, i - j + 1) = String$(i - j + 1, "1")
+            i = i + 1
+        Else
+            i = i + 1
+        End If
+    Loop
+    UrlMask = m
+End Function
+
+Private Function IsMailCh(ByVal ch As String) As Boolean
+    If Len(ch) = 0 Then Exit Function
+    IsMailCh = IsLatCh(ch) Or (ch >= "0" And ch <= "9") Or InStr(1, "._%+-", ch, vbBinaryCompare) > 0
+End Function
 
 Private Function HasSource(ByVal t As String, ByVal toLat As Boolean) As Boolean
     Dim i As Long, ch As String
@@ -240,11 +300,15 @@ End Function
 ' Converts a plain string (used by the self test).
 Private Function ConvertText(ByVal s As String, ByVal toLat As Boolean) As String
     Dim starts() As Long, lens() As Long, cnt As Long, k As Long, tok As String, outS As String
+    Dim mask As String
     cnt = Tokenize(s, toLat, starts, lens)
+    mask = UrlMask(s)
     For k = cnt To 1 Step -1
-        tok = Mid$(s, starts(k), lens(k))
-        If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
-        s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
+        If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) = 0 Then
+            tok = Mid$(s, starts(k), lens(k))
+            If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+            s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
+        End If
     Next k
     ConvertText = s
 End Function

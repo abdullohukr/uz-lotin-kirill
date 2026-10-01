@@ -88,7 +88,8 @@ var sentences = [
   "obyekt subyekt mo‘jiza mo‘tabar sentabr oktabr sentabrda kompyuter film",
   "Abdullaev Tillaeva Boboevich mikroevolyutsiya soy sur tush tol XX asr XIV",
   "ijmo' istisno' ijmo'ni O'zbekiston bog' ma'no O`zbekiston Microsoft Word 'Salom'",
-  "avtomobil avtomobilga albumin aksept Buxoriy 1/30 va Muslim 1773-raqam"
+  "avtomobil avtomobilga albumin aksept Buxoriy 1/30 va Muslim 1773-raqam",
+  "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"
 ];
 sentences.forEach(function (s) {
   tests.push([false, s, t.toCyrillic(s)]);

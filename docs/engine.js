@@ -275,8 +275,8 @@
 
     return {
       options: opt,
-      toCyrillic: function (text) { return text.replace(LAT_WORD_RE, wordToCyrillic); },
-      toLatin: function (text) { return text.replace(CYR_WORD_RE, wordToLatin); },
+      toCyrillic: function (text) { return replaceWords(text, LAT_WORD_RE, wordToCyrillic); },
+      toLatin: function (text) { return replaceWords(text, CYR_WORD_RE, wordToLatin); },
       wordToCyrillic: wordToCyrillic,
       wordToLatin: wordToLatin,
       // user additions: pairs [[latin, cyrillic], ...]
@@ -300,6 +300,25 @@
     };
   }
 
+  // Links and e-mail addresses are never transliterated.
+  var URL_RE = /(?:https?:\/\/|ftp:\/\/|www\.)[^\s<>«»"“”]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+  function urlSpans(text) {
+    var spans = [], m;
+    URL_RE.lastIndex = 0;
+    while ((m = URL_RE.exec(text))) spans.push([m.index, m.index + m[0].length]);
+    return spans;
+  }
+  function inSpans(spans, from, to) {
+    for (var i = 0; i < spans.length; i++) if (from < spans[i][1] && to > spans[i][0]) return true;
+    return false;
+  }
+  function replaceWords(text, re, fn) {
+    var spans = urlSpans(text);
+    return text.replace(re, function (w, offset) {
+      return spans.length && inSpans(spans, offset, offset + w.length) ? w : fn(w);
+    });
+  }
+
   // Count Latin vs Cyrillic letters to guess the direction.
   function detect(text) {
     var lat = (text.match(/[A-Za-z]/g) || []).length;
@@ -308,7 +327,12 @@
     return cyr > lat ? "cyr" : "lat";
   }
 
-  var api = { create: create, detect: detect, _latRules: latRules, _cyrRules: cyrRules, _normLatin: normLatin };
+  var api = {
+    create: create, detect: detect,
+    // fresh global regex matching source-script words: "lat" (Latin words) or "cyr"
+    urlSpans: urlSpans, inSpans: inSpans,
+    wordRegex: function (script) { return new RegExp((script === "lat" ? LAT_WORD_RE : CYR_WORD_RE).source, "g"); },
+    _latRules: latRules, _cyrRules: cyrRules, _normLatin: normLatin };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.UzTranslit = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -1,31 +1,26 @@
 /*
- * Converts a Word document (or the selection) word by word.
+ * Converts a Word document (or the selection).
  *
- * Every paragraph is split into word ranges and only the ranges whose text
- * changes are replaced, so formatting (bold, highlight, font, size), footnote
- * marks, pictures and all punctuation - including « » quotes - stay in place.
+ * Main path: every paragraph's OOXML is read, only the text inside <w:t> is
+ * converted (addin/ooxml.js) and the paragraph is written back. Formatting,
+ * highlights, fonts and all punctuation - including « » quotes - stay as they
+ * were. Writing through OOXML also avoids a Word quirk: insertText marks new
+ * Cyrillic as East Asian text in documents whose East Asian language is
+ * Japanese/Chinese and draws it with a wide Japanese font.
+ *
+ * Fallback path (paragraphs with footnote marks, fields, pictures, tracked
+ * changes, or only partly selected): word ranges are replaced one by one.
  */
-/* global Word, UzTranslit */
+/* global Word, UzTranslit, UzOoxml */
 (function (root) {
   "use strict";
 
-  // Split points. Apostrophes are NOT here: they belong to Latin words (o‘, ma’no).
+  // Split points for the fallback path. Apostrophes are NOT here: they belong to Latin words.
   var DELIMS = [" ", " ", "\t", ",", ".", ":", ";", "!", "?", "«", "»", "“", "”", "„",
     "\"", "(", ")", "[", "]", "/", "-", "–", "—", "…"];
-  var PARAS_PER_BATCH = 40;
+  var PARAS_PER_BATCH = 30;
   // Footnote marks, fields, pictures etc. show up as control characters in range text.
   var OBJECT_CHARS = /[\u0000-\u0008\u000B-\u001F￼]/;
-  var WORD_RE = /[A-Za-zЀ-ӿ'`´‘’ʻʼ]+/g;
-
-  // Word may draw inserted Cyrillic with the East Asian font when the document's
-  // East Asian language is Japanese/Chinese (wide, serif letters). Give the new
-  // text the word's own font in the East Asian slot too.
-  var HAS_FAR_EAST = false;
-  function fixFont(range, fontName) {
-    if (!fontName) return;
-    if (HAS_FAR_EAST) range.font.nameFarEast = fontName;
-    else range.font.name = fontName;
-  }
 
   function makeEngine(settings) {
     var t = UzTranslit.create(root.UZ_EXCEPTIONS || {}, {
@@ -61,51 +56,35 @@
     return stories;
   }
 
-  async function convertParagraphBatch(ctx, paras, convert, limitTo, stats) {
-    // 1. split each paragraph into word ranges
-    var groups = paras.map(function (p) {
-      var r = p.getRange("Content");
-      if (limitTo) {
-        // only the selected part of the paragraph
-        r = r.intersectWithOrNullObject(limitTo);
-        r.load("isNullObject");
-      }
-      return r;
-    });
-    if (limitTo) await ctx.sync();
-    var splits = [];
-    groups.forEach(function (r) {
-      if (limitTo && r.isNullObject) return;
+  // Fallback: replace word ranges of the given ranges one by one.
+  async function convertByWords(ctx, ranges, convert, stats) {
+    var splits = ranges.map(function (r) {
       var s = r.split(DELIMS, false, true, false);
-      s.load("items/text,items/font/name");
-      splits.push({ r: r, s: s });
+      s.load("items/text");
+      return s;
     });
     await ctx.sync();
-
-    // 2. replace only what changes
     var searches = [];
-    splits.forEach(function (sp) {
-      sp.s.items.forEach(function (wr) {
+    splits.forEach(function (s) {
+      s.items.forEach(function (wr) {
         var text = wr.text;
         if (!text) return;
         var out = convert(text);
         if (out === text) return;
         if (!OBJECT_CHARS.test(text)) {
-          var fontName = wr.font.name;
-          fixFont(wr.insertText(out, "Replace"), fontName);
+          wr.insertText(out, "Replace");
           stats.words++;
           return;
         }
-        // The range holds an object (footnote mark, field...). Replace only the
+        // The range holds an object (footnote mark, field...): replace only the
         // letters, word by word, so the object itself is never deleted.
-        var m, seen = {};
-        WORD_RE.lastIndex = 0;
-        while ((m = WORD_RE.exec(text))) {
+        var re = UzTranslit.wordRegex(stats.script), m, seen = {};
+        while ((m = re.exec(text))) {
           var w = m[0], o = convert(w);
           if (o === w || seen[w]) continue;
           seen[w] = true;
           var found = wr.search(w, { matchCase: true });
-          found.load("items/font/name");
+          found.load("items");
           searches.push({ found: found, out: o });
         }
       });
@@ -113,14 +92,52 @@
     if (searches.length) {
       await ctx.sync();
       searches.forEach(function (s) {
-        s.found.items.forEach(function (r) {
-          var fontName = r.font.name;
-          fixFont(r.insertText(s.out, "Replace"), fontName);
-          stats.words++;
-        });
+        s.found.items.forEach(function (r) { r.insertText(s.out, "Replace"); stats.words++; });
       });
     }
     await ctx.sync();
+  }
+
+  async function convertParagraphBatch(ctx, paras, t, limitTo, stats) {
+    var convert = stats.script === "cyr" ? t.toLatin : t.toCyrillic;
+    var wordFn = stats.script === "cyr" ? t.wordToLatin : t.wordToCyrillic;
+
+    // 1. which paragraphs are completely inside the selection (all of them without one)
+    var info = paras.map(function (p) {
+      var o = { p: p, whole: true, part: null, cmp: null };
+      if (limitTo) {
+        o.cmp = p.getRange("Content").compareLocationWith(limitTo);
+        o.part = p.getRange("Content").intersectWithOrNullObject(limitTo);
+        o.part.load("isNullObject");
+      }
+      return o;
+    });
+    if (limitTo) {
+      await ctx.sync();
+      info.forEach(function (o) { o.whole = o.cmp.value === "Inside" || o.cmp.value === "Equal"; });
+    }
+
+    // 2. read OOXML of whole paragraphs
+    info.forEach(function (o) { if (o.whole) o.ox = o.p.getOoxml(); });
+    await ctx.sync();
+
+    // 3. convert; write back whole paragraphs, collect the rest for the fallback
+    var fallback = [];
+    info.forEach(function (o) {
+      if (!o.whole) {
+        if (o.part && !o.part.isNullObject) fallback.push(o.part);
+        return;
+      }
+      var res = UzOoxml.convertPackage(o.ox.value, wordFn, stats.script, UzTranslit.wordRegex);
+      if (res.risky) { fallback.push(o.p.getRange("Content")); stats.fallbackParas++; return; }
+      if (res.changed) {
+        o.p.insertOoxml(res.xml, "Replace");
+        stats.words += res.words;
+        stats.ooxmlParas++;
+      }
+    });
+    await ctx.sync();
+    if (fallback.length) await convertByWords(ctx, fallback, convert, stats);
   }
 
   /*
@@ -130,12 +147,10 @@
    */
   async function convertInWord(direction, scope, settings, onProgress) {
     var t = makeEngine(settings);
-    try {
-      HAS_FAR_EAST = !!(Office.context.requirements &&
-        Office.context.requirements.isSetSupported("WordApiDesktop", "1.3"));
-    } catch (e) { HAS_FAR_EAST = false; }
-    var convert = direction === "lat" ? t.toLatin : t.toCyrillic;
-    var stats = { words: 0, paragraphs: 0, scope: "document" };
+    var stats = {
+      words: 0, paragraphs: 0, scope: "document", ooxmlParas: 0, fallbackParas: 0, extraParas: 0,
+      script: direction === "lat" ? "cyr" : "lat"   // script of the SOURCE words
+    };
 
     await Word.run(async function (ctx) {
       var sel = ctx.document.getSelection();
@@ -147,39 +162,48 @@
       stats.scope = useSel ? "selection" : "document";
 
       var stories = await collectStories(ctx, useSel);
-      var total = 0, done = 0;
-      var paraLists = [];
+      var lists = [];
       for (var i = 0; i < stories.length; i++) {
         var ps = stories[i].range.paragraphs;
         ps.load("items/text");
-        paraLists.push(ps);
+        lists.push({ story: stories[i], ps: ps });
       }
       try { await ctx.sync(); } catch (e) {
         // some header/footer kinds may not exist: load one by one and drop failures
-        paraLists = [];
+        lists = [];
         for (var j = 0; j < stories.length; j++) {
           try {
             var p2 = stories[j].range.paragraphs; p2.load("items/text");
             await ctx.sync();
-            paraLists.push(p2);
+            lists.push({ story: stories[j], ps: p2 });
           } catch (e2) { /* skip */ }
         }
       }
-      // only paragraphs that contain letters of the source script
-      var srcRe = direction === "lat" ? /[\u0400-\u04FF]/ : /[A-Za-z]/;
-      var work = paraLists.map(function (pl) {
-        return pl.items.filter(function (p) { return srcRe.test(p.text || ""); });
-      });
-      work.forEach(function (items) { total += items.length; });
 
-      for (var k = 0; k < work.length; k++) {
-        var items = work[k];
+      // only paragraphs that contain letters of the source script
+      var srcRe = direction === "lat" ? /[Ѐ-ӿ]/ : /[A-Za-z]/;
+      var total = 0, done = 0;
+      lists.forEach(function (l) {
+        l.count = l.ps.items.length;
+        l.work = l.ps.items.filter(function (p) { return srcRe.test(p.text || ""); });
+        total += l.work.length;
+      });
+
+      for (var k = 0; k < lists.length; k++) {
+        var items = lists[k].work;
         for (var b = 0; b < items.length; b += PARAS_PER_BATCH) {
           var batch = items.slice(b, b + PARAS_PER_BATCH);
-          await convertParagraphBatch(ctx, batch, convert, useSel ? sel : null, stats);
+          await convertParagraphBatch(ctx, batch, t, useSel ? sel : null, stats);
           done += batch.length;
           stats.paragraphs = done;
           if (onProgress) onProgress(done, total);
+        }
+        // safety check: writing OOXML must not add paragraphs
+        if (items.length && !useSel) {
+          var after = lists[k].story.range.paragraphs;
+          after.load("items");
+          await ctx.sync();
+          if (after.items.length > lists[k].count) stats.extraParas += after.items.length - lists[k].count;
         }
       }
     });

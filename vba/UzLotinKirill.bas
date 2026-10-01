@@ -136,13 +136,15 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                          ByRef nWords As Long, ByRef nSkipped As Long)
     Dim para As Paragraph, pr As Range, r As Range, t As String
     Dim starts() As Long, lens() As Long, cnt As Long, k As Long
-    Dim tok As String, outS As String, a As Long, b As Long, np As Long, fn As String
+    Dim tok As String, outS As String, a As Long, b As Long, np As Long, mask As String
     For Each para In rng.Paragraphs
         Set pr = para.Range
         t = pr.Text
         If HasSource(t, toLat) Then
             cnt = Tokenize(t, toLat, starts, lens)
+            mask = UrlMask(t)
             For k = cnt To 1 Step -1
+                If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) > 0 Then GoTo NextTok
                 tok = Mid$(t, starts(k), lens(k))
                 If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
                 If StrComp(outS, tok, vbBinaryCompare) <> 0 Then
@@ -152,22 +154,20 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
                         Set r = pr.Duplicate
                         r.SetRange a, b
                         If StrComp(r.Text, tok, vbBinaryCompare) = 0 Then
-                            fn = r.Font.Name
-                            r.Text = outS
-                            ' Word may draw inserted Cyrillic with the East Asian font
-                            ' (documents whose East Asian language is Japanese/Chinese):
-                            ' give the word its own font in every slot.
-                            If Len(fn) > 0 Then
-                                r.SetRange a, a + Len(outS)
-                                If r.Font.NameFarEast <> fn Then r.Font.NameFarEast = fn
-                                If r.Font.NameOther <> fn Then r.Font.NameOther = fn
+                            ' Replace through Find: assigning r.Text makes Word mark new
+                            ' Cyrillic as East Asian (wide Japanese/Chinese font) in
+                            ' documents whose East Asian language is set; Find/Replace does not.
+                            If ReplaceInRange(r, tok, outS) Then
+                                nWords = nWords + 1
+                            Else
+                                nSkipped = nSkipped + 1
                             End If
-                            nWords = nWords + 1
                         Else
                             nSkipped = nSkipped + 1
                         End If
                     End If
                 End If
+NextTok:
             Next k
         End If
         np = np + 1
@@ -179,6 +179,66 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
         End If
     Next para
 End Sub
+
+Private Function ReplaceInRange(ByVal r As Range, ByVal findS As String, ByVal repl As String) As Boolean
+    With r.Find
+        .ClearFormatting
+        .Replacement.ClearFormatting
+        .Text = findS
+        .Replacement.Text = repl
+        .Forward = True
+        .Wrap = wdFindStop
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+        ReplaceInRange = .Execute(Replace:=wdReplaceOne)
+    End With
+End Function
+
+' "1" for every character that belongs to a link (http://, https://, www.) or an e-mail.
+Private Function UrlMask(ByVal t As String) As String
+    Dim m As String, i As Long, j As Long, L As Long, low As String, ch As String
+    L = Len(t)
+    m = String$(L, "0")
+    low = LCase$(t)
+    i = 1
+    Do While i <= L
+        If Mid$(low, i, 7) = "http://" Or Mid$(low, i, 8) = "https://" Or Mid$(low, i, 6) = "ftp://" Or Mid$(low, i, 4) = "www." Then
+            j = i
+            Do While j <= L
+                ch = Mid$(t, j, 1)
+                If ch = " " Or ch = vbCr Or ch = vbTab Or ch = vbLf Or ch = "<" Or ch = ">" Or ch = """" Or _
+                   AscW(ch) = &HAB Or AscW(ch) = &HBB Or AscW(ch) = &H201C Or AscW(ch) = &H201D Or AscW(ch) = &HA0 Then Exit Do
+                j = j + 1
+            Loop
+            Mid$(m, i, j - i) = String$(j - i, "1")
+            i = j
+        ElseIf Mid$(t, i, 1) = "@" Then
+            j = i
+            Do While j > 1
+                If Not IsMailCh(Mid$(t, j - 1, 1)) Then Exit Do
+                j = j - 1
+            Loop
+            Do While i < L
+                If Not IsMailCh(Mid$(t, i + 1, 1)) Then Exit Do
+                i = i + 1
+            Loop
+            Mid$(m, j, i - j + 1) = String$(i - j + 1, "1")
+            i = i + 1
+        Else
+            i = i + 1
+        End If
+    Loop
+    UrlMask = m
+End Function
+
+Private Function IsMailCh(ByVal ch As String) As Boolean
+    If Len(ch) = 0 Then Exit Function
+    IsMailCh = IsLatCh(ch) Or (ch >= "0" And ch <= "9") Or InStr(1, "._%+-", ch, vbBinaryCompare) > 0
+End Function
 
 Private Function HasSource(ByVal t As String, ByVal toLat As Boolean) As Boolean
     Dim i As Long, ch As String
@@ -240,11 +300,15 @@ End Function
 ' Converts a plain string (used by the self test).
 Private Function ConvertText(ByVal s As String, ByVal toLat As Boolean) As String
     Dim starts() As Long, lens() As Long, cnt As Long, k As Long, tok As String, outS As String
+    Dim mask As String
     cnt = Tokenize(s, toLat, starts, lens)
+    mask = UrlMask(s)
     For k = cnt To 1 Step -1
-        tok = Mid$(s, starts(k), lens(k))
-        If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
-        s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
+        If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) = 0 Then
+            tok = Mid$(s, starts(k), lens(k))
+            If toLat Then outS = WordToLat(tok) Else outS = WordToCyr(tok)
+            s = Left$(s, starts(k) - 1) & outS & Mid$(s, starts(k) + lens(k))
+        End If
     Next k
     ConvertText = s
 End Function
@@ -2710,6 +2774,8 @@ Private Sub UzTests1()
     T True, "{0438}{0436}{043C}{043E}{044A} {0438}{0441}{0442}{0438}{0441}{043D}{043E}{044A} {0438}{0436}{043C}{043E}{044A}{043D}{0438} {040E}{0437}{0431}{0435}{043A}{0438}{0441}{0442}{043E}{043D} {0431}{043E}{0493} {043C}{0430}{044A}{043D}{043E} {040E}{0437}{0431}{0435}{043A}{0438}{0441}{0442}{043E}{043D} Microsoft Word '{0421}{0430}{043B}{043E}{043C}'", "ijmo{2019} istisno{2019} ijmo{2019}ni O{2018}zbekiston bog{2018} ma{2019}no O{2018}zbekiston Microsoft Word 'Salom'"
     T False, "avtomobil avtomobilga albumin aksept Buxoriy 1/30 va Muslim 1773-raqam", "{0430}{0432}{0442}{043E}{043C}{043E}{0431}{0438}{043B}{044C} {0430}{0432}{0442}{043E}{043C}{043E}{0431}{0438}{043B}{0433}{0430} {0430}{043B}{044C}{0431}{0443}{043C}{0438}{043D} {0430}{043A}{0446}{0435}{043F}{0442} {0411}{0443}{0445}{043E}{0440}{0438}{0439} 1/30 {0432}{0430} {041C}{0443}{0441}{043B}{0438}{043C} 1773-{0440}{0430}{049B}{0430}{043C}"
     T True, "{0430}{0432}{0442}{043E}{043C}{043E}{0431}{0438}{043B}{044C} {0430}{0432}{0442}{043E}{043C}{043E}{0431}{0438}{043B}{0433}{0430} {0430}{043B}{044C}{0431}{0443}{043C}{0438}{043D} {0430}{043A}{0446}{0435}{043F}{0442} {0411}{0443}{0445}{043E}{0440}{0438}{0439} 1/30 {0432}{0430} {041C}{0443}{0441}{043B}{0438}{043C} 1773-{0440}{0430}{049B}{0430}{043C}", "avtomobil avtomobilga albumin aksept Buxoriy 1/30 va Muslim 1773-raqam"
+    T False, "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing", "{041B}{0438}{043D}{043A}: https://islamqa.info/ar/answers/332928 {0432}{0430} www.savodxon.uz, ism.familiya@example.com {0451}{0437}{0438}{043D}{0433}"
+    T True, "{041B}{0438}{043D}{043A}: https://islamqa.info/ar/answers/332928 {0432}{0430} www.savodxon.uz, ism.familiya@example.com {0451}{0437}{0438}{043D}{0433}", "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"
     T False, "abzas", "{0430}{0431}{0437}{0430}{0446}"
     T True, "{0430}{0431}{0437}{0430}{0446}", "abzas"
     T False, "aeromobil", "{0430}{044D}{0440}{043E}{043C}{043E}{0431}{0438}{043B}{044C}"
@@ -2988,11 +3054,11 @@ Private Sub UzTests1()
     T True, "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{0438}{043D}{0438}", "konsertini"
     T False, "konsertlardan", "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043B}{0430}{0440}{0434}{0430}{043D}"
     T True, "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043B}{0430}{0440}{0434}{0430}{043D}", "konsertlardan"
-    T False, "konsertning", "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043D}{0438}{043D}{0433}"
-    T True, "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043D}{0438}{043D}{0433}", "konsertning"
 End Sub
 
 Private Sub UzTests2()
+    T False, "konsertning", "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043D}{0438}{043D}{0433}"
+    T True, "{043A}{043E}{043D}{0446}{0435}{0440}{0442}{043D}{0438}{043D}{0433}", "konsertning"
     T False, "konsorsium", "{043A}{043E}{043D}{0441}{043E}{0440}{0446}{0438}{0443}{043C}"
     T True, "{043A}{043E}{043D}{0441}{043E}{0440}{0446}{0438}{0443}{043C}", "konsorsium"
     T False, "konstruksiya", "{043A}{043E}{043D}{0441}{0442}{0440}{0443}{043A}{0446}{0438}{044F}"
@@ -3291,11 +3357,11 @@ Private Sub UzTests2()
     T True, "{0432}{0430}{043B}{044C}{0442}{0435}{0440}", "valter"
     T False, "vatslav", "{0432}{0430}{0446}{043B}{0430}{0432}"
     T True, "{0432}{0430}{0446}{043B}{0430}{0432}", "vatslav"
-    T False, "velvet", "{0432}{0435}{043B}{044C}{0432}{0435}{0442}"
-    T True, "{0432}{0435}{043B}{044C}{0432}{0435}{0442}", "velvet"
 End Sub
 
 Private Sub UzTests3()
+    T False, "velvet", "{0432}{0435}{043B}{044C}{0432}{0435}{0442}"
+    T True, "{0432}{0435}{043B}{044C}{0432}{0435}{0442}", "velvet"
     T False, "vermishel", "{0432}{0435}{0440}{043C}{0438}{0448}{0435}{043B}"
     T True, "{0432}{0435}{0440}{043C}{0438}{0448}{0435}{043B}", "vermishel"
     T False, "vidyeofilm", "{0432}{0438}{0434}{0435}{043E}{0444}{0438}{043B}{044C}{043C}"
@@ -3594,11 +3660,11 @@ Private Sub UzTests3()
     T False, "Indometatsinlardan", "{0418}{043D}{0434}{043E}{043C}{0435}{0442}{0430}{0446}{0438}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "insektitsidlardan", "{0438}{043D}{0441}{0435}{043A}{0442}{0438}{0446}{0438}{0434}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Insektitsidlardan", "{0418}{043D}{0441}{0435}{043A}{0442}{0438}{0446}{0438}{0434}{043B}{0430}{0440}{0434}{0430}{043D}"
-    T False, "inspekslardan", "{0438}{043D}{0441}{043F}{0435}{043A}{0446}{043B}{0430}{0440}{0434}{0430}{043D}"
-    T False, "Inspekslardan", "{0418}{043D}{0441}{043F}{0435}{043A}{0446}{043B}{0430}{0440}{0434}{0430}{043D}"
 End Sub
 
 Private Sub UzTests4()
+    T False, "inspekslardan", "{0438}{043D}{0441}{043F}{0435}{043A}{0446}{043B}{0430}{0440}{0434}{0430}{043D}"
+    T False, "Inspekslardan", "{0418}{043D}{0441}{043F}{0435}{043A}{0446}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "intermessolardan", "{0438}{043D}{0442}{0435}{0440}{043C}{0435}{0446}{0446}{043E}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Intermessolardan", "{0418}{043D}{0442}{0435}{0440}{043C}{0435}{0446}{0446}{043E}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "interstitsiylardan", "{0438}{043D}{0442}{0435}{0440}{0441}{0442}{0438}{0446}{0438}{0439}{043B}{0430}{0440}{0434}{0430}{043D}"
@@ -3897,11 +3963,11 @@ Private Sub UzTests4()
     T False, "Velzerlardan", "{0412}{0435}{043B}{044C}{0437}{0435}{0440}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "videoimpulslardan", "{0432}{0438}{0434}{0435}{043E}{0438}{043C}{043F}{0443}{043B}{044C}{0441}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Videoimpulslardan", "{0412}{0438}{0434}{0435}{043E}{0438}{043C}{043F}{0443}{043B}{044C}{0441}{043B}{0430}{0440}{0434}{0430}{043D}"
-    T False, "vinilatsetilenlardan", "{0432}{0438}{043D}{0438}{043B}{0430}{0446}{0435}{0442}{0438}{043B}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
-    T False, "Vinilatsetilenlardan", "{0412}{0438}{043D}{0438}{043B}{0430}{0446}{0435}{0442}{0438}{043B}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
 End Sub
 
 Private Sub UzTests5()
+    T False, "vinilatsetilenlardan", "{0432}{0438}{043D}{0438}{043B}{0430}{0446}{0435}{0442}{0438}{043B}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
+    T False, "Vinilatsetilenlardan", "{0412}{0438}{043D}{0438}{043B}{0430}{0446}{0435}{0442}{0438}{043B}{0435}{043D}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "visseritlardan", "{0432}{0438}{0441}{0446}{0435}{0440}{0438}{0442}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "Visseritlardan", "{0412}{0438}{0441}{0446}{0435}{0440}{0438}{0442}{043B}{0430}{0440}{0434}{0430}{043D}"
     T False, "volvokslardan", "{0432}{043E}{043B}{044C}{0432}{043E}{043A}{0441}{043B}{0430}{0440}{0434}{0430}{043D}"
