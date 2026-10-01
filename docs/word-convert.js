@@ -28,7 +28,8 @@
   function makeEngine(settings) {
     var t = UzTranslit.create(root.UZ_EXCEPTIONS || {}, {
       okina: settings.okina,
-      tutuq: settings.tutuq
+      tutuq: settings.tutuq,
+      keepForeign: settings.keepForeign !== false
     });
     if (settings.userPairs && settings.userPairs.length) t.addUserPairs(settings.userPairs);
     if (settings.skipWords && settings.skipWords.length) t.addSkipWords(settings.skipWords);
@@ -103,7 +104,7 @@
 
   async function convertParagraphBatch(ctx, paras, t, limitTo, stats) {
     var convert = stats.script === "cyr" ? t.toLatin : t.toCyrillic;
-    var wordFn = stats.script === "cyr" ? t.wordToLatin : t.wordToCyrillic;
+    var plan = function (text) { return t.planEdits(text, stats.script); };
 
     // 1. which paragraphs are completely inside the selection (all of them without one)
     var WHOLE = { Inside: 1, InsideStart: 1, InsideEnd: 1, Equal: 1 };
@@ -142,7 +143,7 @@
     var fallback = [];
     info.forEach(function (o) {
       if (!o.ox) return;
-      var res = UzOoxml.convertPackage(o.ox.value, wordFn, stats.script, UzTranslit.wordRegex, o.window);
+      var res = UzOoxml.convertPackage(o.ox.value, plan, o.window);
       if (res.risky) {
         fallback.push(o.window ? o.part : o.p.getRange("Content"));
         stats.fallbackParas++;

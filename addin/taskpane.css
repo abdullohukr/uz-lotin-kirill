@@ -69,3 +69,5 @@ textarea, select {
 #status { min-height: 1.4em; margin: 8px 0 0; font-size: 13px; }
 #status.error { color: var(--error); }
 code { font-size: 12px; }
+.field.check { display: flex; gap: 6px; align-items: flex-start; }
+.field.check input { margin-top: 3px; }

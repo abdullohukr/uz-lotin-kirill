@@ -41,12 +41,12 @@
   }
 
   /*
-   * pkg: OOXML string. convertWord(word) -> converted word. script: "lat" | "cyr"
-   * (the script of the SOURCE words). window: optional [from, to] in paragraph
-   * text offsets (as Range.text counts them) - only words fully inside change.
+   * pkg: OOXML string. plan(text) -> [[from, to, replacement], ...] (the engine's
+   * planEdits for one direction). window: optional [from, to] in paragraph text
+   * offsets (as Range.text counts them) - only words fully inside change.
    * Returns { xml, changed, words, risky }.
    */
-  function convertPackage(pkg, convertWord, script, wordRegex, window) {
+  function convertPackage(pkg, plan, window) {
     var bb = bodyBounds(pkg);
     if (!bb) return { xml: pkg, changed: 0, risky: true };
     var body = pkg.slice(bb[0], bb[1]);
@@ -67,15 +67,9 @@
     if (!nodes.length) return { xml: pkg, changed: 0, risky: false };
 
     // 2. find words to change: [from, to, replacement]
-    var edits = [];
-    var re = wordRegex(script);
-    var urls = root.UzTranslit.urlSpans(joined);
-    while ((m = re.exec(joined))) {
-      if (urls.length && root.UzTranslit.inSpans(urls, m.index, m.index + m[0].length)) continue;
-      if (window && (m.index < window[0] || m.index + m[0].length > window[1])) continue;
-      var out = convertWord(m[0]);
-      if (out !== m[0]) edits.push([m.index, m.index + m[0].length, out]);
-    }
+    var edits = plan(joined).filter(function (ed) {
+      return !window || (ed[0] >= window[0] && ed[1] <= window[1]);
+    });
     if (!edits.length) return { xml: pkg, changed: 0, risky: false };
 
     // 3. rebuild each node: a whole replacement goes into the node where the word starts

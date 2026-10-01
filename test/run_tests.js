@@ -4,7 +4,8 @@
  * (from the project folder)
  */
 load("src/engine.js");
-var ex = JSON.parse(readFile("data/exceptions.json"));
+load("tools/load_data.js");
+var ex = loadUzData();
 var t = UzTranslit.create(ex);
 
 var fails = 0, n = 0;
@@ -46,6 +47,17 @@ both.forEach(function (p) {
 });
 
 // one direction only
+// foreign names and brands stay Latin
+eq("brands in quotes", t.toCyrillic("bozorda «Smarts Vey», «Gold Kvest» va «Seven Daymond» kabi"), "бозорда «Smarts Vey», «Gold Kvest» ва «Seven Daymond» каби");
+eq("cadenza", t.toCyrillic("«CADENZAX MUSIC» platformasi, «CadenzaX music» nomli"), "«CADENZAX MUSIC» платформаси, «CadenzaX music» номли");
+eq("vip", t.toCyrillic("maxsus «VIP» darajalarni, VIP xizmat"), "махсус «VIP» даражаларни, VIP хизмат");
+eq("apple youtube", t.toCyrillic("platformalarida (Apple Music, YouTube va h.k.) eshitilganda"), "платформаларида (Apple Music, YouTube ва ҳ.к.) эшитилганда");
+eq("english spelling", t.toCyrillic("Google, Facebook, iPhone, Telegram, online"), "Google, Facebook, iPhone, Телеграм, online");
+eq("uzbek words that are english too", t.toCyrillic("men ham sport internet son top mana film massa proton Napoleon"), "мен ҳам спорт интернет сон топ мана фильм масса протон Наполеон");
+eq("uzbek quote stays converted", t.toCyrillic("«Sahihi Buxoriy» va «Ixlos» surasi"), "«Саҳиҳи Бухорий» ва «Ихлос» сураси");
+eq("surah names and quotations", t.toCyrillic("«Nun» surasi, «Hud» surasi. «Yusha’ ibn Nun tirik edi yoki Bani Isroil payg‘ambarlaridan Ilyos kabilar tirik edi»"), "«Нун» сураси, «Ҳуд» сураси. «Юшаъ ибн Нун тирик эди ёки Бани Исроил пайғамбарларидан Илёс кабилар тирик эди»");
+eq("bee'tibor", t.toCyrillic("bee’tibor, QR kod"), "беэътибор, ҚР код");
+eq("sath inshoot", t.toCyrillic("yer sathi, inshootlar, Movarounnahr"), "ер сатҳи, иншоотлар, Мовароуннаҳр");
 eq("urls stay", t.toCyrillic("Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"), "Линк: https://islamqa.info/ar/answers/332928 ва www.savodxon.uz, ism.familiya@example.com ёзинг");
 eq("savodxon stems", t.toCyrillic("avtomobil avtomobilga albumin aksept"), "автомобиль автомобилга альбумин акцепт");
 eq("uzbek words keep no ь", t.toCyrillic("tush tol mil"), "туш тол мил");
@@ -56,6 +68,7 @@ eq("bare ashob", t.toCyrillic("ashob Ishoq"), "асҳоб Исҳоқ");
 eq("straight apostrophes", t.toCyrillic("O'zbekiston bog' ma'no"), "Ўзбекистон боғ маъно");
 eq("backtick apostrophes", t.toCyrillic("O`zbekiston"), "Ўзбекистон");
 eq("foreign words stay", t.toCyrillic("Microsoft Word va WhatsApp"), "Microsoft Word ва WhatsApp");
+eq("final ayn", t.toCyrillic("Yusha’ va shay’ ‘Salom’ dedi"), "Юшаъ ва шайъ ‘Салом’ деди");
 eq("single quotes stay", t.toCyrillic("'Salom'"), "'Салом'");
 eq("cyr circus", t.toLatin("цирк лицей Цой"), "sirk litsey Soy");
 eq("hyphen", t.toCyrillic("Abu-Dabi"), "Абу-Даби");

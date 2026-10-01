@@ -10,3 +10,5 @@
 - `data/savodxon_pairs.tsv`: Latin/Cyrillic word pairs from the Savodxon project
   (savodxon.uz), a free public tool for Uzbek spelling. `[ь]` marks a soft sign used only at the
   end of the word. Each entry is checked against the corpus before use.
+- `tools/en_50k.txt` (used to build `data/foreign.json`): FrequencyWords by Hermit Dave,
+  MIT License, https://github.com/hermitdave/FrequencyWords (OpenSubtitles 2018).

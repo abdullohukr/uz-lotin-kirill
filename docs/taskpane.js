@@ -6,7 +6,9 @@
   var busy = false;
 
   function engine() {
-    var t = UzTranslit.create(window.UZ_EXCEPTIONS || {}, { okina: settings.okina, tutuq: settings.tutuq });
+    var t = UzTranslit.create(window.UZ_EXCEPTIONS || {}, {
+      okina: settings.okina, tutuq: settings.tutuq, keepForeign: settings.keepForeign !== false
+    });
     t.addUserPairs(settings.userPairs || []);
     t.addSkipWords(settings.skipWords || []);
     return t;
@@ -14,6 +16,7 @@
 
   function fillForm() {
     $("style").value = settings.style;
+    $("keepForeign").checked = settings.keepForeign !== false;
     $("pairs").value = UzSettings.formatPairs(settings.userPairs || []);
     $("skip").value = (settings.skipWords || []).join("\n");
   }
@@ -60,6 +63,7 @@
     $("tryLat").onclick = function () { $("tryOut").value = engine().toLatin($("tryIn").value); };
     $("save").onclick = function () {
       settings.style = $("style").value;
+      settings.keepForeign = $("keepForeign").checked;
       settings.userPairs = UzSettings.parsePairs($("pairs").value);
       settings.skipWords = $("skip").value.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
       UzSettings.save(settings);

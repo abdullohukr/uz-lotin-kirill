@@ -9,7 +9,7 @@
   };
 
   function defaults() {
-    return { style: "typographic", userPairs: [], skipWords: [] };
+    return { style: "typographic", userPairs: [], skipWords: [], keepForeign: true };
   }
 
   function load() {
@@ -30,7 +30,7 @@
   function save(s) {
     try {
       root.localStorage.setItem(KEY, JSON.stringify({
-        style: s.style, userPairs: s.userPairs, skipWords: s.skipWords
+        style: s.style, userPairs: s.userPairs, skipWords: s.skipWords, keepForeign: s.keepForeign
       }));
     } catch (e) { /* ignore */ }
   }

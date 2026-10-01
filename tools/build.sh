@@ -12,7 +12,13 @@ python3 tools/make_icons.py >/dev/null
 cp addin/*.html addin/*.js addin/*.css dist/
 cp addin/assets/*.png dist/assets/
 cp src/engine.js dist/engine.js
-{ printf 'window.UZ_EXCEPTIONS = '; cat data/exceptions.json; printf ';\n'; } > dist/exceptions.js
+python3 - <<'PY'
+import json
+ex = json.load(open("data/exceptions.json"))
+ex["foreign"] = json.load(open("data/foreign.json"))
+ex["acronyms"] = json.load(open("data/acronyms.json"))
+open("dist/exceptions.js", "w").write("window.UZ_EXCEPTIONS = " + json.dumps(ex, ensure_ascii=False, separators=(",", ":")) + ";\n")
+PY
 # cache busting: the pages load their scripts with ?v=<version from version.json>
 VER="$(date +%Y%m%d%H%M%S)"
 printf '{"v":"%s"}\n' "$VER" > dist/version.json

@@ -21,12 +21,16 @@ Option Explicit
 '   3 = plain '
 Private Const APOS_STYLE As Long = 1
 Private Const LUGAT_FILE As String = "UzLotinKirill-lugat.docx"
+' Keep English words / brand names in Latin when converting to Cyrillic
+' (YouTube, "Gold Kvest", Apple Music, VIP). False = convert everything.
+Private Const KEEP_FOREIGN As Boolean = True
 Private Const CODES As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@"
 
 Private gLoaded As Boolean
 Private gL2C As Collection, gL2CStem As Collection
 Private gC2L As Collection, gC2LStem As Collection
 Private gUL2C As Collection, gUC2L As Collection, gSkip As Collection
+Private gWeak As Collection, gAcr As Collection
 Private gMaxL2C As Long, gMaxC2L As Long
 Private gLugatStamp As String
 Private gTestN As Long, gTestFail As Long, gTestMsg As String
@@ -143,6 +147,7 @@ Private Sub ConvertRange(ByVal rng As Range, ByVal toLat As Boolean, ByVal clip 
         If HasSource(t, toLat) Then
             cnt = Tokenize(t, toLat, starts, lens)
             mask = UrlMask(t)
+            If KEEP_FOREIGN And Not toLat Then mask = ForeignMask(t, starts, lens, cnt, mask)
             For k = cnt To 1 Step -1
                 If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) > 0 Then GoTo NextTok
                 tok = Mid$(t, starts(k), lens(k))
@@ -280,6 +285,15 @@ Private Function Tokenize(ByVal t As String, ByVal toLat As Boolean, starts() As
                     Exit Do
                 End If
             Loop
+            ' final ayn after another letter (Yusha', shay'), unless it closes a 'single quote'
+            nx = Mid$(t, j + 1, 1)
+            If (nx = ChrW(&H2019) Or nx = ChrW(&H2BC)) And IsLatCh(Mid$(t, j, 1)) And Not IsLatCh(Mid$(t, j + 2, 1)) Then
+                If i = 1 Then
+                    j = j + 1
+                ElseIf Mid$(t, i - 1, 1) <> ChrW(&H2018) And Mid$(t, i - 1, 1) <> "'" Then
+                    j = j + 1
+                End If
+            End If
         Else
             j = 0
         End If
@@ -303,6 +317,7 @@ Private Function ConvertText(ByVal s As String, ByVal toLat As Boolean) As Strin
     Dim mask As String
     cnt = Tokenize(s, toLat, starts, lens)
     mask = UrlMask(s)
+    If KEEP_FOREIGN And Not toLat Then mask = ForeignMask(s, starts, lens, cnt, mask)
     For k = cnt To 1 Step -1
         If InStr(1, Mid$(mask, starts(k), lens(k)), "1", vbBinaryCompare) = 0 Then
             tok = Mid$(s, starts(k), lens(k))
@@ -317,7 +332,12 @@ End Function
 
 Private Function WordToCyr(ByVal w As String) As String
     Dim norm As String, key As String, pat As Long, v As String, L As Long, maxL As Long
-    If IsForeign(w) Or IsRoman(w) Then WordToCyr = w: Exit Function
+    If IsRoman(w) Then WordToCyr = w: Exit Function
+    If KEEP_FOREIGN Then
+        If IsStrongForeign(w) Then WordToCyr = w: Exit Function
+    ElseIf IsForeign(w) Then
+        WordToCyr = w: Exit Function
+    End If
     norm = NormLatin(w)
     key = LatKey(norm)
     If CHas(gSkip, "L" & key) Then WordToCyr = w: Exit Function
@@ -546,6 +566,119 @@ Private Function IsForeign(ByVal w As String) As Boolean
     Next i
 End Function
 
+' Clearly foreign: w / c, a capital inside the word (YouTube, CadenzaX), spellings
+' Uzbek never uses (ph, ee, gh, ck, -consonant+le, -consonant+y), or a keep-Latin word.
+Private Function IsStrongForeign(ByVal w As String) As Boolean
+    Dim i As Long, lw As String, L As Long, p As String, v As String
+    If IsForeign(w) Then IsStrongForeign = True: Exit Function
+    For i = 2 To Len(w)
+        If IsLatCh(Mid$(w, i, 1)) And IsUpperCh(Mid$(w, i, 1)) And IsLatCh(Mid$(w, i - 1, 1)) And Not IsUpperCh(Mid$(w, i - 1, 1)) Then
+            IsStrongForeign = True: Exit Function
+        End If
+    Next i
+    lw = LC(w): L = Len(lw)
+    If CHas(gAcr, lw) Then IsStrongForeign = True: Exit Function
+    If L < 4 Then Exit Function
+    If InStr(1, lw, "ph", vbBinaryCompare) > 0 Or InStr(1, lw, "gh", vbBinaryCompare) > 0 Or _
+       InStr(1, lw, "ck", vbBinaryCompare) > 0 Then IsStrongForeign = True: Exit Function
+    i = InStr(1, lw, "ee", vbBinaryCompare)
+    Do While i > 0
+        If Not IsApos(Mid$(lw, i + 2, 1)) Then IsStrongForeign = True: Exit Function
+        i = InStr(i + 1, lw, "ee", vbBinaryCompare)
+    Loop
+    p = Mid$(lw, L - 2, 1)
+    If Right$(lw, 2) = "le" And InStr(1, "aeiou", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
+    p = Mid$(lw, L - 1, 1)
+    If Right$(lw, 1) = "y" And InStr(1, "aeiouy", p, vbBinaryCompare) = 0 And Not IsApos(p) Then IsStrongForeign = True: Exit Function
+End Function
+
+' English word from the list (Seven, Gold, Smarts) - only counts inside short names.
+Private Function IsWeakForeign(ByVal w As String) As Boolean
+    Dim lw As String
+    lw = LC(w)
+    If CHas(gWeak, lw) Then IsWeakForeign = True: Exit Function
+    If Len(lw) > 3 And Right$(lw, 1) = "s" Then IsWeakForeign = CHas(gWeak, Left$(lw, Len(lw) - 1))
+End Function
+
+' Marks ("1") Latin words that stay Latin: clearly foreign words, short names in
+' quotes with a foreign word ("Gold Kvest", "CadenzaX music"), and capitalised
+' names joined to a clearly foreign word (Apple Music).
+Private Function ForeignMask(ByVal t As String, starts() As Long, lens() As Long, ByVal cnt As Long, ByVal m As String) As String
+    Dim strong() As Boolean, foreign() As Boolean, k As Long, g As Long, i As Long, j As Long, L As Long
+    Dim ch As String, n As Long, anyStrong As Boolean, anyForeign As Boolean, allCap As Boolean, gap As String
+    Dim opens As String, closes As String, allQ As String
+    ForeignMask = m
+    If cnt = 0 Then Exit Function
+    ReDim strong(1 To cnt): ReDim foreign(1 To cnt)
+    For k = 1 To cnt
+        strong(k) = IsStrongForeign(Mid$(t, starts(k), lens(k)))
+        foreign(k) = strong(k)
+        If Not strong(k) Then foreign(k) = IsWeakForeign(Mid$(t, starts(k), lens(k)))
+        If strong(k) Then Mid$(m, starts(k), lens(k)) = String$(lens(k), "1")
+    Next k
+    ' short names in quotes
+    opens = ChrW(&HAB) & ChrW(&H201C) & ChrW(&H201E) & """"
+    closes = ChrW(&HBB) & ChrW(&H201D) & ChrW(&H201C) & """"
+    allQ = opens & ChrW(&HBB) & ChrW(&H201D)
+    L = Len(t)
+    i = 1
+    Do While i <= L
+        If InStr(1, opens, Mid$(t, i, 1), vbBinaryCompare) > 0 Then
+            j = i + 1
+            Do While j <= L And j - i <= 121
+                ch = Mid$(t, j, 1)
+                If InStr(1, closes, ch, vbBinaryCompare) > 0 Then Exit Do
+                If InStr(1, allQ, ch, vbBinaryCompare) > 0 Or ch = vbCr Then j = L + 1: Exit Do
+                j = j + 1
+            Loop
+            If j <= L And j - i <= 121 Then
+                n = 0: anyStrong = False: anyForeign = False: allCap = True
+                For k = 1 To cnt
+                    If starts(k) > i And starts(k) + lens(k) - 1 < j Then
+                        n = n + 1
+                        If strong(k) Then anyStrong = True
+                        If foreign(k) Then anyForeign = True
+                        If Not IsUpperCh(Mid$(t, starts(k), 1)) Then allCap = False
+                    End If
+                Next k
+                If n >= 1 And n <= 4 And (anyStrong Or (n >= 2 And allCap And anyForeign)) Then
+                    For k = 1 To cnt
+                        If starts(k) > i And starts(k) + lens(k) - 1 < j Then Mid$(m, starts(k), lens(k)) = String$(lens(k), "1")
+                    Next k
+                End If
+                i = j + 1
+            Else
+                i = i + 1
+            End If
+        Else
+            i = i + 1
+        End If
+    Loop
+    ' capitalised names joined by single spaces
+    k = 1
+    Do While k <= cnt
+        g = k
+        Do While g < cnt
+            gap = Mid$(t, starts(g) + lens(g), starts(g + 1) - starts(g) - lens(g))
+            If Not (IsUpperCh(Mid$(t, starts(g), 1)) And IsUpperCh(Mid$(t, starts(g + 1), 1)) And (gap = " " Or gap = ChrW(&HA0))) Then Exit Do
+            g = g + 1
+        Loop
+        If g > k Then
+            anyStrong = False
+            For i = k To g
+                If strong(i) Then anyStrong = True
+            Next i
+            If anyStrong Then
+                For i = k To g
+                    Mid$(m, starts(i), lens(i)) = String$(lens(i), "1")
+                Next i
+            End If
+        End If
+        k = g + 1
+    Loop
+    ForeignMask = m
+End Function
+
 Private Function IsRoman(ByVal w As String) As Boolean
     Dim i As Long, v As Long, cur As Long, nxt As Long
     If Len(w) = 0 Or Len(w) > 15 Then Exit Function
@@ -764,6 +897,7 @@ Private Sub LoadAll()
         Set gL2C = New Collection: Set gL2CStem = New Collection
         Set gC2L = New Collection: Set gC2LStem = New Collection
         Set gUL2C = New Collection: Set gUC2L = New Collection: Set gSkip = New Collection
+        Set gWeak = New Collection: Set gAcr = New Collection
         gMaxL2C = 0: gMaxC2L = 0
         LoadData
         gLoaded = True
@@ -853,6 +987,22 @@ Private Sub LoadLugat()
                 CAdd gSkip, "C" & Enc(LC(ln)), "1"
             End If
         End If
+    Next i
+End Sub
+
+Private Sub AddWeak(ByVal words As String)
+    Dim a() As String, i As Long
+    a = Split(words, " ")
+    For i = LBound(a) To UBound(a)
+        If Len(a(i)) > 0 Then CAdd gWeak, a(i), "1"
+    Next i
+End Sub
+
+Private Sub AddAcr(ByVal words As String)
+    Dim a() As String, i As Long
+    a = Split(words, " ")
+    For i = LBound(a) To UBound(a)
+        If Len(a(i)) > 0 Then CAdd gAcr, a(i), "1"
     Next i
 End Sub
 

@@ -9,6 +9,7 @@
  * Cyrillic dictionary text uses a one-letter ASCII code, test strings use {XXXX}.
  */
 load("src/engine.js");
+load("tools/load_data.js");
 
 var CYRSET = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяўқғҳ";
 var CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@";
@@ -36,7 +37,7 @@ function str(s) {
 }
 function latKey(k) { return k.replace(/'/g, "_"); }
 
-var ex = JSON.parse(readFile("data/exceptions.json"));
+var ex = loadUzData();
 var lines = [];
 function L2(s) { lines.push(s); }
 
@@ -69,6 +70,12 @@ function emitSubs(prefix, list, per) {
 }
 
 var dataSubs = emitSubs("UzData", stmts, 400);
+// keep-Latin words and English words (packed, one call per ~90 words)
+var packed = [];
+packed.push("AddAcr " + str((ex.acronyms || []).join(" ")));
+var fw = ex.foreign || [];
+for (var fi = 0; fi < fw.length; fi += 90) packed.push("AddWeak " + str(fw.slice(fi, fi + 90).join(" ")));
+dataSubs = dataSubs.concat(emitSubs("UzForeign", packed, 60));
 L2("Private Sub LoadData()");
 dataSubs.forEach(function (n) { L2("    " + n); });
 L2("End Sub");
@@ -89,7 +96,12 @@ var sentences = [
   "Abdullaev Tillaeva Boboevich mikroevolyutsiya soy sur tush tol XX asr XIV",
   "ijmo' istisno' ijmo'ni O'zbekiston bog' ma'no O`zbekiston Microsoft Word 'Salom'",
   "avtomobil avtomobilga albumin aksept Buxoriy 1/30 va Muslim 1773-raqam",
-  "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing"
+  "Link: https://islamqa.info/ar/answers/332928 va www.savodxon.uz, ism.familiya@example.com yozing",
+  "bozorda «Smarts Vey», «Gold Kvest» va «Seven Daymond» kabi, «CADENZAX MUSIC», «CadenzaX music», maxsus «VIP» darajalar",
+  "platformalarida (Apple Music, YouTube va h.k.) Google, Facebook, iPhone, Telegram, online",
+  "men ham sport internet son top mana film massa proton Napoleon bee’tibor, QR kod, yer sathi, inshootlar",
+  "«Nun» surasi, «Hud» surasi. «Yusha’ ibn Nun tirik edi yoki Bani Isroil payg‘ambarlaridan Ilyos kabilar tirik edi»",
+  "Yusha’ va shay’ ‘Salom’ dedi"
 ];
 sentences.forEach(function (s) {
   tests.push([false, s, t.toCyrillic(s)]);

@@ -40,12 +40,25 @@
 
   // Latin word: letters, plus an apostrophe that is followed by a letter
   // or that directly follows o/g (o‘ / g‘ at the end of a word: obro‘, tog‘).
+  // ...and a final ’ / ʼ after another letter (ayn: Yusha’, shay’); planEdits
+  // gives it back when it closes a single quote (‘Salom’).
   var LAT_WORD_RE = new RegExp(
-    "[A-Za-z](?:[A-Za-z]|[" + APOS + "](?=[A-Za-z])|(?<=[oOgG])[" + APOS + "])*",
+    "[A-Za-z](?:[A-Za-z]|[" + APOS + "](?=[A-Za-z])|(?<=[oOgG])[" + APOS + "]|(?<=[A-Za-z])[\u2019\u02BC](?![A-Za-z]))*",
     "g"
   );
   var CYR_WORD_RE = /[Ѐ-ӿ]+/g;
   var ROMAN_RE = /^(?=[MDCLXVI])M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+
+  // Clearly foreign (non-Uzbek) Latin words: letters or spellings Uzbek never uses,
+  // or a capital inside the word (YouTube, iPhone, CadenzaX).
+  var FOREIGN_LETTERS = /[wW]|[cC](?![hH])/;
+  var FOREIGN_SPELLING = /ph|ee(?!['\u02BB\u02BC\u2018\u2019])|gh|ck|[^aeiou'\u02BB\u02BC\u2018\u2019]le$|[^aeiouy'\u02BB\u02BC\u2018\u2019]y$/;
+  function isStrongForeign(word) {
+    if (FOREIGN_LETTERS.test(word)) return true;
+    if (/[a-z][A-Z]/.test(word)) return true;                    // CamelCase
+    var lw = word.toLowerCase();
+    return lw.length >= 4 && FOREIGN_SPELLING.test(lw);
+  }
 
   function isUpper(ch) {
     return ch !== ch.toLowerCase() && ch === ch.toUpperCase();
@@ -213,18 +226,104 @@
 
   function create(exceptions, options) {
     var opt = {
-      okina: "‘", // o‘ g‘
-      tutuq: "’"  // ma’no
+      okina: "‘",   // o‘ g‘
+      tutuq: "’",   // ma’no
+      keepForeign: true  // keep English words / brand names in Latin
     };
     if (options) for (var k in options) opt[k] = options[k];
     exceptions = exceptions || {};
     var l2c = buildIndex(exceptions.lat2cyr);
     var c2l = buildIndex(exceptions.cyr2lat);
     var skip = {};
+    // English words kept in Latin inside quotes or next to a clearly foreign word
+    var weak = {};
+    (exceptions.foreign || []).forEach(function (w) { weak[w] = true; });
+    // words that stay Latin everywhere, in any case (VIP, SMS, PDF, online...)
+    var acronyms = {};
+    (exceptions.acronyms || []).forEach(function (w) { acronyms[w] = true; });
+
+    function isWeakForeign(word) {
+      var lw = word.toLowerCase();
+      return !!(weak[lw] || (lw.length > 3 && /s$/.test(lw) && weak[lw.slice(0, -1)]));
+    }
+    function isAcronym(word) {
+      return !!acronyms[word.toLowerCase()];
+    }
+
+    var QUOTE_SPAN = /[«“„"]([^«»“”„"\n]{1,120})[»”“"]/g;
+
+    /*
+     * Decides which words of a text change: [[from, to, replacement], ...].
+     * script: "lat" (Latin words -> Cyrillic) or "cyr".
+     * Links and e-mails never change. Going to Cyrillic, names in quotes that
+     * contain a foreign word («Gold Kvest», «CadenzaX music») and capitalised
+     * names joined to a clearly foreign word (Apple Music) stay in Latin.
+     */
+    function planEdits(text, script) {
+      var re = new RegExp((script === "lat" ? LAT_WORD_RE : CYR_WORD_RE).source, "g");
+      var fn = script === "lat" ? wordToCyrillic : wordToLatin;
+      var urls = urlSpans(text);
+      var toks = [], m;
+      while ((m = re.exec(text))) {
+        var w = m[0];
+        // ‘Salom’: the final ’ closes a single quote, it is not part of the word
+        if (/[\u2019\u02BC]$/.test(w) && !/[oOgG][\u2019\u02BC]$/.test(w) &&
+            /[\u2018']/.test(text.charAt(m.index - 1))) w = w.slice(0, -1);
+        toks.push({ s: m.index, e: m.index + w.length, w: w, keep: false });
+      }
+      if (script === "lat" && opt.keepForeign) {
+        toks.forEach(function (t) {
+          t.strong = isStrongForeign(t.w) || isAcronym(t.w);
+          t.foreign = t.strong || isWeakForeign(t.w);
+          if (t.strong) t.keep = true;
+        });
+        // names in quotes
+        QUOTE_SPAN.lastIndex = 0;
+        while ((m = QUOTE_SPAN.exec(text))) {
+          var a = m.index, b = m.index + m[0].length;
+          var inside = toks.filter(function (t) { return t.s > a && t.e < b; });
+          // only short names: «VIP», «CadenzaX music», «Gold Kvest» - never quotations
+          if (!inside.length || inside.length > 4) continue;
+          var strong = inside.some(function (t) { return t.strong; });
+          var nameLike = inside.length >= 2 &&
+            inside.every(function (t) { return isUpper(t.w[0]); }) &&
+            inside.some(function (t) { return t.foreign; });
+          if (strong || nameLike) inside.forEach(function (t) { t.keep = true; });
+        }
+        // capitalised names joined by spaces: Apple Music, Smarts Vey
+        var i = 0;
+        while (i < toks.length) {
+          var j = i;
+          while (j + 1 < toks.length && isUpper(toks[j + 1].w[0]) && isUpper(toks[j].w[0]) &&
+                 /^[ \u00A0]$/.test(text.slice(toks[j].e, toks[j + 1].s))) j++;
+          if (j > i) {
+            var group = toks.slice(i, j + 1);
+            if (group.some(function (t) { return t.strong; })) group.forEach(function (t) { t.keep = true; });
+          }
+          i = j + 1;
+        }
+      }
+      var edits = [];
+      toks.forEach(function (t) {
+        if (t.keep) return;
+        if (urls.length && inSpans(urls, t.s, t.e)) return;
+        var out = fn(t.w);
+        if (out !== t.w) edits.push([t.s, t.e, out]);
+      });
+      return edits;
+    }
+
+    function applyEdits(text, edits) {
+      for (var k = edits.length - 1; k >= 0; k--) {
+        text = text.slice(0, edits[k][0]) + edits[k][2] + text.slice(edits[k][1]);
+      }
+      return text;
+    }
 
     function wordToCyrillic(word) {
-      // Foreign words (contain w, or c not followed by h) and Roman numerals stay as is.
-      if (/[wW]|[cC](?![hH])/.test(word)) return word;
+      // Clearly foreign words and Roman numerals stay as is.
+      if (opt.keepForeign && isStrongForeign(word)) return word;
+      if (!opt.keepForeign && FOREIGN_LETTERS.test(word)) return word;
       if (ROMAN_RE.test(word)) return word;
       var norm = normLatin(word);
       var key = latKey(norm);
@@ -275,8 +374,9 @@
 
     return {
       options: opt,
-      toCyrillic: function (text) { return replaceWords(text, LAT_WORD_RE, wordToCyrillic); },
-      toLatin: function (text) { return replaceWords(text, CYR_WORD_RE, wordToLatin); },
+      toCyrillic: function (text) { return applyEdits(text, planEdits(text, "lat")); },
+      toLatin: function (text) { return applyEdits(text, planEdits(text, "cyr")); },
+      planEdits: planEdits,
       wordToCyrillic: wordToCyrillic,
       wordToLatin: wordToLatin,
       // user additions: pairs [[latin, cyrillic], ...]
@@ -312,12 +412,7 @@
     for (var i = 0; i < spans.length; i++) if (from < spans[i][1] && to > spans[i][0]) return true;
     return false;
   }
-  function replaceWords(text, re, fn) {
-    var spans = urlSpans(text);
-    return text.replace(re, function (w, offset) {
-      return spans.length && inSpans(spans, offset, offset + w.length) ? w : fn(w);
-    });
-  }
+
 
   // Count Latin vs Cyrillic letters to guess the direction.
   function detect(text) {
