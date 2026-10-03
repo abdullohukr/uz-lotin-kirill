@@ -1,0 +1,12 @@
+# Lotin <-> Kirill: removes the Word add-in on Windows.
+#   irm https://abdullohukr.github.io/uz-lotin-kirill/win-uninstall.txt | iex
+$Dir = Join-Path $env:LOCALAPPDATA 'LotinKirill'
+$Manifest = Join-Path $Dir 'manifest.xml'
+$Dev = 'HKCU:\Software\Microsoft\Office\16.0\WEF\Developer'
+if (Test-Path $Manifest) {
+  $Id = ([xml](Get-Content $Manifest -Raw)).OfficeApp.Id
+  Remove-ItemProperty -Path $Dev -Name $Id -ErrorAction SilentlyContinue
+}
+Remove-Item -Recurse -Force $Dir -ErrorAction SilentlyContinue
+Write-Host "Lotin <-> Kirill o'chirildi / удалён. Word'ni qayta ishga tushiring / Перезапустите Word."
+Write-Host "Offline macro (if imported) stays in Normal.dotm: VBA editor -> Remove UzLotinKirill."

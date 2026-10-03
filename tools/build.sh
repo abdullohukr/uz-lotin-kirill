@@ -12,6 +12,7 @@ python3 tools/make_icons.py >/dev/null
 python3 tools/build_brands.py >/dev/null
 cp addin/*.html addin/*.js addin/*.css dist/
 cp addin/assets/*.png dist/assets/
+cp addin/install/* dist/          # mac.sh, win.txt (+ uninstall): one-line installers
 cp src/engine.js dist/engine.js
 python3 - <<'PY'
 import json

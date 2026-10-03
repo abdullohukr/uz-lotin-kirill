@@ -89,9 +89,31 @@
 
 ## Вариант 1. Надстройка (онлайн)
 
+### Установка одной командой
+
+**macOS:** откройте Терминал (Launchpad → Терминал), вставьте команду и нажмите Enter:
+
+```
+curl -fsSL https://abdullohukr.github.io/uz-lotin-kirill/mac.sh | bash
+```
+
+**Windows 10/11:** откройте PowerShell, вставьте команду и нажмите Enter:
+
+```
+irm https://abdullohukr.github.io/uz-lotin-kirill/win.txt | iex
+```
+
+Затем откройте Word: появится вкладка **Lotin-Kirill** с кнопками **Kirillga**, **Lotinga**, **Panel**.
+Команда также кладёт офлайн-макрос `UzLotinKirill.bas` в папку *Документы/Lotin-Kirill*.
+Повторный запуск команды = обновление. Права администратора не нужны.
+
+Удаление: `curl -fsSL https://abdullohukr.github.io/uz-lotin-kirill/mac-uninstall.sh | bash`
+(Mac) или `irm https://abdullohukr.github.io/uz-lotin-kirill/win-uninstall.txt | iex` (Windows).
+
+### Установка вручную
+
 Надстройка размещена на GitHub Pages: https://abdullohukr.github.io/uz-lotin-kirill/
-Для установки нужен только файл [`manifest.xml`](manifest.xml)
-(на GitHub: открыть файл → кнопка **Download raw file**).
+Для установки нужен только файл [`manifest.xml`](manifest.xml).
 
 ### Mac
 
