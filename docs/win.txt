@@ -1,0 +1,37 @@
+# Lotin <-> Kirill: Word add-in installer for Windows 10/11. No administrator rights needed.
+# Run in PowerShell:  irm https://abdullohukr.github.io/uz-lotin-kirill/win.txt | iex
+# Uninstall:          irm https://abdullohukr.github.io/uz-lotin-kirill/win-uninstall.txt | iex
+# Also saves the offline macro (VBA) to Documents\Lotin-Kirill for use without internet.
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+$Site = 'https://abdullohukr.github.io/uz-lotin-kirill'
+$Repo = 'https://raw.githubusercontent.com/abdullohukr/uz-lotin-kirill/main'
+$Dir  = Join-Path $env:LOCALAPPDATA 'LotinKirill'
+$Docs = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Lotin-Kirill'
+New-Item -ItemType Directory -Force -Path $Dir, $Docs | Out-Null
+
+if (Get-Process WINWORD -ErrorAction SilentlyContinue) {
+  Write-Host "Word'ni yoping (hujjatlarni saqlang), so'ng Enter bosing." -ForegroundColor Yellow
+  Write-Host "Закройте Word (сохраните документы), затем нажмите Enter." -ForegroundColor Yellow
+  Read-Host "Enter"
+}
+
+Write-Host "`n1/2  Word add-in: Lotin <-> Kirill" -ForegroundColor Cyan
+$Manifest = Join-Path $Dir 'manifest.xml'
+Invoke-WebRequest -UseBasicParsing "$Site/manifest.xml" -OutFile $Manifest
+$Id = ([xml](Get-Content $Manifest -Raw)).OfficeApp.Id
+# Word lists the add-ins registered here (sideloading for the current user). The key is opened, never
+# recreated: New-Item -Force emptied it and so removed other add-ins registered there (Khatt al-Quran...).
+$Dev = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Software\Microsoft\Office\16.0\WEF\Developer')
+$Dev.SetValue($Id, $Manifest); $Dev.Close()
+Write-Host "  $Manifest"
+
+Write-Host "`n2/2  Offline macro (VBA) -> $Docs" -ForegroundColor Cyan
+try {
+  Invoke-WebRequest -UseBasicParsing "$Repo/vba/UzLotinKirill.bas" -OutFile (Join-Path $Docs 'UzLotinKirill.bas')
+  Write-Host ("  " + (Join-Path $Docs 'UzLotinKirill.bas'))
+} catch { Write-Host "  ! not available now, skipped" -ForegroundColor Yellow }
+
+
+Write-Host "`nTayyor. Word'ni oching: «Lotin-Kirill» yorlig'ida Kirillga / Lotinga / Panel tugmalari." -ForegroundColor Green
+Write-Host "Готово. Откройте Word: вкладка «Lotin-Kirill», кнопки Kirillga / Lotinga / Panel." -ForegroundColor Green

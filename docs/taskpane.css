@@ -1,0 +1,73 @@
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --text: #1d2330;
+  --muted: #687082;
+  --line: #dfe3ea;
+  --accent: #1f6feb;
+  --accent-text: #ffffff;
+  --error: #c62828;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1f22;
+    --card: #2a2c30;
+    --text: #e8eaed;
+    --muted: #a0a6b1;
+    --line: #3b3e44;
+    --accent: #4c8dff;
+    --error: #ff7b72;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+h1 { font-size: 18px; margin: 0; }
+h2 { font-size: 14px; margin: 0 0 8px; }
+.sub, .muted { color: var(--muted); font-size: 12px; }
+.sub { margin: 4px 0 12px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.row { display: flex; gap: 8px; margin: 6px 0; }
+.row button { flex: 1; }
+button {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
+button:disabled { opacity: .5; cursor: default; }
+fieldset.scope { border: 0; padding: 0; margin: 8px 0 0; }
+fieldset.scope label { display: block; font-size: 13px; margin: 3px 0; }
+textarea, select {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px;
+}
+.field { display: block; font-size: 13px; margin-bottom: 10px; }
+.field textarea, .field select { margin-top: 4px; }
+#progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 10px; }
+#bar { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+#status { min-height: 1.4em; margin: 8px 0 0; font-size: 13px; }
+#status.error { color: var(--error); }
+code { font-size: 12px; }
+.field.check { display: flex; gap: 6px; align-items: flex-start; }
+.field.check input { margin-top: 3px; }
